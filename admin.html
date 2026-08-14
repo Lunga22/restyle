@@ -170,5 +170,40 @@
 
     <script src="script.js"></script> 
 
+    <!-- Edit Product Modal Popup -->
+    <div id="edit-product-modal" class="modal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; padding: 25px; border-radius: 8px; z-index: 1002; width: 90%; max-width: 420px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+        <div class="modal-content" style="position: relative;">
+            <span class="close-btn" onclick="closeEditModal()" style="position: absolute; right: 0; top: -10px; cursor: pointer; font-size: 24px; font-weight: bold;">&times;</span>
+            <h3 style="margin-bottom: 15px; text-transform: uppercase; font-size: 16px;"><i class="fas fa-edit"></i> Edit Product</h3>
+            
+            <form id="edit-product-form">
+                <!-- Hidden input to store product ID -->
+                <input type="hidden" id="edit-prod-id">
+
+                <label style="display:block; text-align:left; font-size:12px; font-weight:bold; margin-top:10px; color:#444;">Product Title:</label>
+                <input type="text" id="edit-prod-title" required class="modal-input" style="width:100%; padding:8px; margin-top:4px; border:1px solid #ccc; border-radius:4px;">
+
+                <label style="display:block; text-align:left; font-size:12px; font-weight:bold; margin-top:10px; color:#444;">Price (R):</label>
+                <input type="number" id="edit-prod-price" step="0.01" required class="modal-input" style="width:100%; padding:8px; margin-top:4px; border:1px solid #ccc; border-radius:4px;">
+
+                <label style="display:block; text-align:left; font-size:12px; font-weight:bold; margin-top:10px; color:#444;">Stock Quantity:</label>
+                <input type="number" id="edit-prod-stock" min="0" required class="modal-input" style="width:100%; padding:8px; margin-top:4px; border:1px solid #ccc; border-radius:4px;">
+
+                <label style="display:block; text-align:left; font-size:12px; font-weight:bold; margin-top:10px; color:#444;">Availability Status:</label>
+                <select id="edit-prod-status" required class="modal-input" style="width:100%; padding:8px; margin-top:4px; border:1px solid #ccc; border-radius:4px; background:#fff8e1;">
+                    <option value="available">✔ Available Now for Purchase</option>
+                    <option value="coming_soon">🔥 Coming Soon (Teaser Only)</option>
+                </select>
+
+                <button type="submit" class="btn-dark full-btn" style="margin-top: 20px; background: #222; color: #fff; width: 100%; padding: 10px; border: none; font-weight: 600; cursor: pointer; border-radius:4px;">
+                    <i class="fas fa-save"></i> UPDATE PRODUCT
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Modal Overlay -->
+    <div id="edit-modal-overlay" class="overlay" onclick="closeEditModal()"></div>
+    
 </body>
 </html>
