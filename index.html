@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restyle Thrifty - Bags & Accessories</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,400&family=Great+Vibes&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+	<script src="https://js.paystack.co/v1/inline.js"></script>
+     <link rel="manifest" href="manifest.json">
+</head>
+<body>
+
+    <!-- Top Announcement Bar -->
+    <div class="top-bar">
+        <span>Welcome to Restyle Thrifty <span class="heart">♥</span></span>
+        <span>Stylish Bags, Affordable Prices</span>
+        <div class="top-socials">
+            <i class="fab fa-facebook-f" onclick="alert('Redirecting to Facebook...')"></i>
+            <i class="fab fa-instagram" onclick="alert('Redirecting to Instagram...')"></i>
+            <i class="fab fa-tiktok" onclick="alert('Redirecting to TikTok...')"></i>
+        </div>
+    </div>
+
+    <!-- Header / Navbar -->
+    <header>
+        <div class="brand-logo" onclick="scrollToSection('home')">
+            <h1 class="logo-title">Restyle <span class="heart">♥</span></h1>
+            <div class="logo-sub">— THRIFTY —</div>
+            <div class="logo-tag">• BAGS & ACCESSORIES •</div>
+        </div>
+<nav class="nav-links">
+    <a href="#home" class="active">HOME</a>
+    <a href="shop.html">SHOP</a>
+    <a href="#new-arrivals">NEW ARRIVALS</a>
+    <a href="about.html">ABOUT US</a>
+    <a href="#footer">CONTACT</a>
+</nav>
+      <div class="header-actions">
+    <i class="fas fa-search" id="open-search" title="Search"></i>
+    
+    <!-- User Account Display -->
+    <div id="account-btn-wrap" class="account-btn-wrap">
+        <i class="far fa-user" id="open-account" title="Account Login"></i>
+        <span id="user-display-name" class="user-display-name"></span>
+    </div>
+
+    <!-- Cart Icon with Badge -->
+    <div class="cart-wrapper" id="open-cart" title="View Cart">
+        <i class="fas fa-shopping-bag"></i>
+        <span id="cart-count">0</span>
+    </div>
+</div> 
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-section" id="home">
+        <div class="hero-text">
+            <p class="hero-overline">FIND YOUR PERFECT BAG <span class="heart">♥</span></p>
+            <h2 class="hero-title">STYLE THAT<br><span class="script-font">Completes You</span> <span class="heart">♥</span></h2>
+            <p class="hero-desc">Trendy. Affordable. Yours.<br>Bags for every mood, every moment.</p>
+            <div class="hero-btns">
+                <button class="btn-dark" onclick="scrollToSection('categories')"><a href="shop.html">SHOP NOW</a> <i class="fas fa-shopping-bag"></i></button>
+                <button class="btn-outline" onclick="scrollToSection('new-arrivals')"><a href="#new-arrivals">NEW ARRIVALS</a> &rarr;</button>
+            </div>
+        </div>
+        <!-- Hero Image synced with Product ID 1 -->
+        <div class="hero-image-box" data-id="1">
+            <img src="https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=800&auto=format&fit=crop" alt="Featured Bags">
+        </div>
+    </section>
+
+    <!-- Value Props Bar -->
+    <section class="features-bar" id="about">
+        <div class="feature-item">
+            <i class="fas fa-truck"></i>
+            <div><strong>FAST DELIVERY</strong><span>Quick & reliable delivery</span></div>
+        </div>
+        <div class="feature-item">
+            <i class="fas fa-shield-alt"></i>
+            <div><strong>SECURE PAYMENT</strong><span>100% secure checkout</span></div>
+        </div>
+        <div class="feature-item">
+            <i class="fas fa-ribbon"></i>
+            <div><strong>PREMIUM QUALITY</strong><span>Carefully selected bags</span></div>
+        </div>
+        <div class="feature-item">
+            <i class="fas fa-headset"></i>
+            <div><strong>CUSTOMER SUPPORT</strong><span>We're here to help</span></div>
+        </div>
+    </section>
+
+    <!-- Shop By Category -->
+   
+            </div>
+            <button class="carousel-arrow right" id="slide-right"><i class="fas fa-chevron-right"></i></button>
+        </div>
+		
+		<div id="products-container" class="products-grid"></div>
+    </section>
+
+    <!-- New Arrivals Section -->
+    <section class="new-arrivals" id="new-arrivals">
+        <h3 class="section-heading">NEW ARRIVALS <span class="heart">♥</span></h3>
+        <div class="products-grid">
+
+            <!-- Product Card 1 -->
+            <div class="product-card" data-id="1">
+                <div class="product-img-box">
+                    <img src="https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=500" alt="Classic Quilted Shoulder Bag">
+                    <span class="category-badge">New</span>
+                </div>
+                <div class="product-info">
+                    <h4>Classic Quilted Shoulder Bag</h4>
+                    <div class="product-price">E299.00</div>
+                    <button type="button" class="btn-dark full-btn add-to-cart-btn" onclick="addToCart('Classic Quilted Shoulder Bag', 299, 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=500')">
+                        <i class="fas fa-shopping-bag"></i> ADD TO CART
+                    </button>
+                </div>
+            </div>
+
+            <!-- Product Card 2 -->
+            <div class="product-card" data-id="2">
+                <div class="product-img-box">
+                    <img src="https://images.unsplash.com/photo-1544816155-12df9643f363?w=600" alt="Minimalist Leather Tote">
+                    <span class="category-badge">New</span>
+                </div>
+                <div class="product-info">
+                    <h4>Minimalist Leather Tote</h4>
+                    <div class="product-price">E349.00</div>
+                    <button type="button" class="btn-dark full-btn add-to-cart-btn" onclick="addToCart('Minimalist Leather Tote', 349, 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=600')">
+                        <i class="fas fa-shopping-bag"></i> ADD TO CART
+                    </button>
+                </div>
+            </div>
+
+            <!-- Product Card 3 -->
+            <div class="product-card" data-id="3">
+                <div class="product-img-box">
+                    <img src="https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=600" alt="Compact Crossbody Pouch">
+                    <span class="category-badge">New</span>
+                </div>
+                <div class="product-info">
+                    <h4>Compact Crossbody Pouch</h4>
+                    <div class="product-price">E189.00</div>
+                    <button type="button" class="btn-dark full-btn add-to-cart-btn" onclick="addToCart('Compact Crossbody Pouch', 189, 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=600')">
+                        <i class="fas fa-shopping-bag"></i> ADD TO CART
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </section>
+              
+    <!-- COMING SOON HIGHLIGHTS SECTION -->
+    <section class="coming-soon-section" style="padding: 25px 15px; background: #fafafa; margin: 20px 0;">
+        <div style="text-align:center; margin-bottom:15px;">
+            <h3 style="font-size: 20px; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 1px;">Upcoming Collections</h3>
+            <p style="color: #666; font-size: 12px;">Exciting new drops launching soon at Restyle Thrifty!</p>
+        </div>
+
+        <div class="teaser-grid">
+            <!-- Shoes -->
+            <div class="teaser-card" data-id="4">
+                <img src="https://images.unsplash.com/photo-1549298916-b41d501d3772?w=500" alt="Shoes Collection">
+                <div class="teaser-card-info">
+                    <span class="coming-soon-badge">Coming Soon</span>
+                    <h4>Footwear & Shoes</h4>
+                    <p>Sneakers, heels & trendy boots</p>
+                </div>
+            </div>
+
+            <!-- Fragrances -->
+            <div class="teaser-card" data-id="5">
+                <img src="https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=500" alt="Fragrances">
+                <div class="teaser-card-info">
+                    <span class="coming-soon-badge">Coming Soon</span>
+                    <h4>Luxury Fragrances</h4>
+                    <p>Perfumes & signature mists</p>
+                </div>
+            </div>
+
+            <!-- Lip Glosses -->
+            <div class="teaser-card" data-id="6">
+                <img src="https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=500" alt="Lip Glosses">
+                <div class="teaser-card-info">
+                    <span class="coming-soon-badge">Coming Soon</span>
+                    <h4>Lip Oils & Glosses</h4>
+                    <p>Hydrating lip oils & gloss shades</p>
+                </div>
+            </div>
+
+            <!-- Apparel / Clothing -->
+            <div class="teaser-card" data-id="7">
+                <img src="https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=500" alt="Thrift Clothing">
+                <div class="teaser-card-info">
+                    <span class="coming-soon-badge">Coming Soon</span>
+                    <h4>Thrift Clothing</h4>
+                    <p>Vintage jackets, tops & denim</p>
+                </div>
+            </div>
+        </div>
+    </section>
+			  
+    <!-- Promo 4-Column Banner -->
+    <section class="promo-grid">
+        <div class="promo-text-card">
+            <span class="promo-tag">NEW COLLECTION</span>
+            <h2>New Styles<br><span class="script-font">Just For You</span> <span class="heart">♥</span></h2>
+            <p>Discover the latest trendy bags handpicked for your everyday style.</p>
+            <button class="btn-dark" onclick="scrollToSection('new-arrivals')"> <a href="shop.html">EXPLORE COLLECTION</a> &rarr;</button>
+        </div>
+        <div class="promo-img-card" data-id="2"><img src="https://images.unsplash.com/photo-1544816155-12df9643f363?w=500" alt="Look 1"></div>
+        <div class="promo-img-card" data-id="1"><img src="https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=500" alt="Look 2"></div>
+        <div class="promo-img-card" data-id="3"><img src="https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=500" alt="Look 3"></div>
+    </section>
+
+    <!-- Bottom Features -->
+    <section class="bottom-features">
+        <div class="b-feature"><i class="fas fa-ribbon"></i><div><strong>AFFORDABLE PRICES</strong><span>Stylish bags that fit your budget</span></div></div>
+        <div class="b-feature"><i class="fas fa-gem"></i><div><strong>TRENDY DESIGNS</strong><span>Stay stylish, always</span></div></div>
+        <div class="b-feature"><i class="fas fa-check-circle"></i><div><strong>QUALITY YOU CAN TRUST</strong><span>Bags made to last</span></div></div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="footer">
+        <div class="footer-col newsletter-col">
+            <div class="nl-head">
+                <i class="far fa-envelope"></i>
+                <div>
+                    <strong>STAY IN THE LOOP</strong>
+                    <p>Subscribe for new arrivals, special offers and exclusive updates.</p>
+                </div>
+            </div>
+            <form id="newsletter-form" class="nl-form">
+                <input type="email" id="newsletter-email" placeholder="Your email address" required>
+                <button type="submit">SUBSCRIBE</button>
+            </form>
+        </div>
+
+       <div class="footer-col contact-col">
+    <strong>CONTACT & POLICIES</strong>
+    <p style="font-size:12px; margin-top:5px;"><i class="fas fa-map-marker-alt" style="color:#9e6038;"></i> 32 Wattle Street, Dawn Park, Boksburg</p>
+    <p style="font-size:12px;"><i class="fas fa-phone" style="color:#9e6038;"></i> +27 81 538 5051 / +27 73 921 8067</p>
+    <p style="font-size:12px;"><i class="fas fa-envelope" style="color:#9e6038;"></i> gugunyawose6@gmail.com</p>
+    <p style="font-size:12px; color:#d32f2f; font-weight:bold; margin-top:5px;"><i class="fas fa-info-circle"></i> Policy: No Return / No Refund</p>
+</div>
+
+        <div class="footer-col links-col">
+            <strong>QUICK LINKS</strong>
+            <a href="shop.html">Shop</a>
+            <a href="#new-arrivals">New Arrivals</a>
+            <a href="about.html">About Us</a>
+            <a href="#footer">Contact Us</a>
+            <a href="#footer">FAQs</a>
+        </div>
+
+        <div class="footer-col links-col">
+            <strong>CUSTOMER CARE</strong>
+            <a href="#">Shipping & Delivery</a>
+            <a href="#">Returns & Exchanges</a>
+            <a href="#">Size Guide</a>
+            <a href="#">Track Your Order</a>
+            <a href="#">Help Center</a>
+        </div>
+
+        <div class="footer-col social-col">
+            <strong>FOLLOW US</strong>
+            <div class="foot-social-icons">
+                <i class="fab fa-facebook-f" onclick="alert('Redirecting to Facebook...')"></i>
+                <i class="fab fa-instagram" onclick="alert('Redirecting to Instagram...')"></i>
+                <i class="fab fa-tiktok" onclick="alert('Redirecting to TikTok...')"></i>
+            </div>
+            <p class="handle">@restylethrifty <span class="heart">♥</span></p>
+        </div>
+    </footer>
+
+    <div class="copyright-bar">
+        <span class="heart">♥</span> &nbsp; © 2024 Restyle Thrifty. All Rights Reserved. &nbsp; <span class="heart">♥</span>
+    </div>
+
+    <!-- Modals & Cart Drawer -->
+    <div class="cart-drawer" id="cart-drawer">
+        <div class="cart-header">
+            <h3>YOUR SHOPPING CART (<span id="drawer-cart-count">0</span>)</h3>
+            <span class="close-btn" id="close-cart">&times;</span>
+        </div>
+        <div class="cart-items" id="cart-items-container">
+            <p class="empty-msg">Your cart is currently empty.</p>
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total-row">
+                <span>Total:</span>
+                <strong id="cart-total-price">E0.00</strong>
+            </div>
+            <button class="btn-dark full-btn" onclick="checkout()">PROCEED TO CHECKOUT</button>
+        </div>
+    </div>
+    <div class="overlay" id="overlay"></div>
+
+    <div class="modal" id="search-modal">
+        <div class="modal-box">
+            <span class="close-btn" id="close-search">&times;</span>
+            <h3>Search Products</h3>
+            <div class="search-flex">
+                <input type="text" id="search-input" placeholder="Search for handbags, totes, backpacks...">
+                <button onclick="performSearch()"><i class="fas fa-search"></i></button>
+            </div>
+        </div>
+    </div>
+
+   <div class="modal" id="account-modal">
+    <div class="modal-box">
+        <span class="close-btn" id="close-account">&times;</span>
+        <h3>Customer Login</h3>
+        <form id="customer-login-form">
+            <input type="text" id="customer-username" placeholder="Username / Your Name" required class="modal-input">
+            <input type="email" id="customer-email" placeholder="Email Address" required class="modal-input">
+            <input type="password" placeholder="Password" required class="modal-input">
+            <button type="submit" class="btn-dark full-btn">SIGN IN</button>
+        </form>
+    </div>
+</div>
+
+<!-- Checkout Payment & Delivery Modal -->
+<div class="modal" id="checkout-modal">
+    <div class="modal-box" style="max-width:480px;">
+        <span class="close-btn" id="close-checkout">&times;</span>
+        <h3>Delivery & Payment</h3>
+        <p style="font-size:12px; color:#666; margin-top:4px; margin-bottom:12px;">Enter your delivery details before choosing a payment method:</p>
+        
+        <!-- Delivery Address Form -->
+        <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:15px; text-align:left;">
+            <input type="tel" id="delivery-phone" placeholder="Phone / WhatsApp Number *" required style="padding:9px; border:1px solid #ccc; border-radius:4px; font-size:13px;">
+            <input type="text" id="delivery-address" placeholder="Street Address (House/Apt, Street Name) *" required style="padding:9px; border:1px solid #ccc; border-radius:4px; font-size:13px;">
+            <div style="display:flex; gap:8px;">
+                <input type="text" id="delivery-suburb" placeholder="Suburb / Town *" required style="flex:1; padding:9px; border:1px solid #ccc; border-radius:4px; font-size:13px;">
+                <input type="text" id="delivery-city" placeholder="City *" required style="flex:1; padding:9px; border:1px solid #ccc; border-radius:4px; font-size:13px;">
+            </div>
+            <textarea id="delivery-notes" placeholder="Special Delivery Instructions / Gate Code (Optional)" style="padding:9px; border:1px solid #ccc; border-radius:4px; font-size:12px; height:50px; resize:vertical;"></textarea>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:10px;">
+            <!-- Paystack Online Payment -->
+            <button class="btn-dark full-btn" onclick="payWithPaystack()" style="display:flex; align-items:center; justify-content:center; gap:8px;">
+                <i class="fas fa-credit-card"></i> Pay with card
+            </button>
+
+            <!-- Direct Bank Transfer -->
+            <button class="btn-primary full-btn" onclick="toggleEftDetails()" style="display:flex; align-items:center; justify-content:center; gap:8px; background:#444; border-color:#444;">
+                <i class="fas fa-university"></i> Manual Bank Transfer (EFT)
+            </button>
+        </div>
+
+        <!-- Hidden EFT Details -->
+        <div id="eft-details" style="display:none; margin-top:15px; padding:12px; background:#f9f9f9; border:1px solid #ddd; border-radius:4px; font-size:12px; text-align:left;">
+            <strong style="color:#222; display:block; margin-bottom:6px;">Banking Details for Manual Payment:</strong>
+            <p style="margin:3px 0;"><strong>Bank:</strong> Capitec Bank / FNB</p>
+            <p style="margin:3px 0;"><strong>Account Name:</strong> Restyle Thrifty</p>
+            <p style="margin:3px 0;"><strong>Account Number:</strong> 1234567890</p>
+            <p style="margin:3px 0;"><strong>Branch Code:</strong> 470010</p>
+            <p style="margin:3px 0; color:#d32f2f;"><strong>Reference:</strong> Your Full Name</p>
+            <hr style="margin:8px 0; border:0; border-top:1px solid #eee;">
+            <button class="btn-dark full-btn" onclick="completeEftOrder()" style="margin-top:6px; padding:8px; font-size:12px;">CONFIRM EFT ORDER</button>
+        </div>
+    </div>
+</div>
+
+    <script src="script.js"></script>
+</body>
+</html>
