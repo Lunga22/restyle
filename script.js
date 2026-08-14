@@ -370,7 +370,7 @@ function updateCartUI() {
             }).join('');
         }
     }
-    if (totalPriceRl) totalPriceRl.innerText = `R${total.toFixed(2)}`;
+    if (totalPriceEl) totalPriceEl.innerText = `R${total.toFixed(2)}`;
 }
 
 /* --- CHECKOUT & PAYSTACK PAYMENT --- */
