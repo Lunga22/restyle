@@ -835,7 +835,7 @@ function renderAdminSales() {
             <td style="padding:8px;">${order.date}</td>
             <td style="padding:8px;">${order.customer} <br><small style="color:#666;">${order.email}</small></td>
             <td style="padding:8px;">${order.items}</td>
-            <td style="padding:8px;"><strong>E${parseFloat(order.total).toFixed(2)}</strong></td>
+            <td style="padding:8px;"><strong>R${parseFloat(order.total).toFixed(2)}</strong></td>
         </tr>
     `).join('');
 }
