@@ -336,7 +336,7 @@ function updateCartUI() {
     const cartCount = document.getElementById('cart-count');
     const drawerCartCount = document.getElementById('drawer-cart-count');
     const container = document.getElementById('cart-items-container');
-    const totalPriceEl = document.getElementById('cart-total-price');
+    const totalPriceRl = document.getElementById('cart-total-price');
 
     const totalQty = cart.reduce((sum, item) => sum + (item.qty || 1), 0);
     if (cartCount) cartCount.innerText = totalQty;
@@ -370,7 +370,7 @@ function updateCartUI() {
             }).join('');
         }
     }
-    if (totalPriceEl) totalPriceEl.innerText = `R${total.toFixed(2)}`;
+    if (totalPriceRl) totalPriceRl.innerText = `R${total.toFixed(2)}`;
 }
 
 /* --- CHECKOUT & PAYSTACK PAYMENT --- */
