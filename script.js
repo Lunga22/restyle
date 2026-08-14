@@ -358,7 +358,7 @@ function updateCartUI() {
                             <img src="${item.image}" style="width:40px; height:40px; object-fit:cover; border-radius:4px;">
                             <div>
                                 <strong style="font-size:12px;">${item.title}</strong>
-                                <div style="font-size:11px; color:#666;">Qty: ${itemQty} × E${itemPrice.toFixed(2)}</div>
+                                <div style="font-size:11px; color:#666;">Qty: ${itemQty} × R${itemPrice.toFixed(2)}</div>
                             </div>
                         </div>
                         <div style="text-align:right;">
