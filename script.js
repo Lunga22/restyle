@@ -674,10 +674,10 @@ function renderAdminStats() {
     loadOrders();
     loadProducts();
 
-    const revenueEl = document.getElementById('total-revenue-display');
-    const ordersEl = document.getElementById('total-orders-display');
-    const itemsSoldEl = document.getElementById('total-items-sold-display');
-    const prodCountEl = document.getElementById('total-prod-count');
+    const revenueRl = document.getElementById('total-revenue-display');
+    const ordersRl = document.getElementById('total-orders-display');
+    const itemsSoldRl = document.getElementById('total-items-sold-display');
+    const prodCountRl = document.getElementById('total-prod-count');
 
     let totalRevenue = 0;
     let totalItems = 0;
@@ -695,10 +695,10 @@ function renderAdminStats() {
         }
     });
 
-    if (revenueEl) revenueEl.innerText = `E${totalRevenue.toFixed(2)}`;
-    if (ordersEl) ordersEl.innerText = orders.length;
-    if (itemsSoldEl) itemsSoldEl.innerText = totalItems;
-    if (prodCountEl) prodCountEl.innerText = products.length;
+    if (revenueRl) revenueRl.innerText = `R${totalRevenue.toFixed(2)}`;
+    if (ordersRl) ordersRl.innerText = orders.length;
+    if (itemsSoldRl) itemsSoldRl.innerText = totalItems;
+    if (prodCountRl) prodCountRl.innerText = products.length;
 }
 
 /* --- ADD NEW PRODUCT / TEASER FORM --- */
