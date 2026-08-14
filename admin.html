@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restyle Thrifty - Admin Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="admin-body">
+
+    <!-- Admin Login Overlay -->
+    <div id="admin-login-screen" class="admin-login-screen">
+        <div class="admin-login-card">
+            <h2>Admin Login</h2>
+            <p>Restyle Thrifty Management</p>
+            <form id="admin-login-form">
+                <input type="password" id="admin-pass-input" placeholder="Enter Admin Password" required class="modal-input">
+                <button type="submit" class="btn-dark full-btn">LOGIN TO DASHBOARD</button>
+            </form>
+            <p style="font-size: 11px; margin-top: 10px; color: #888;"> <strong></strong></p>
+        </div>
+    </div>
+
+    <!-- Admin Main Dashboard Content -->
+    <div id="admin-dashboard" class="admin-dashboard" style="display: none;">
+        <header class="admin-header">
+            <h2>Restyle Thrifty — Admin Panel</h2>
+            <div>
+                <a href="index.html" class="btn-outline">View Storefront</a>
+                <button id="admin-logout-btn" class="btn-danger">Logout</button>
+            </div>
+        </header>
+
+        <main class="admin-container">
+
+            <!-- Store Stats Overview -->
+            <section class="admin-card" style="margin-bottom: 20px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; text-align: center;">
+                    <div style="padding: 10px; background: #fafafa; border-radius: 6px; border-left: 4px solid #9e6038;">
+                        <small style="color:#666;">Total Revenue</small>
+                        <h3 id="total-revenue-display" style="margin: 5px 0 0;">E0.00</h3>
+                    </div>
+                    <div style="padding: 10px; background: #fafafa; border-radius: 6px; border-left: 4px solid #2e7d32;">
+                        <small style="color:#666;">Total Orders</small>
+                        <h3 id="total-orders-display" style="margin: 5px 0 0;">0</h3>
+                    </div>
+                    <div style="padding: 10px; background: #fafafa; border-radius: 6px; border-left: 4px solid #0288d1;">
+                        <small style="color:#666;">Items Sold</small>
+                        <h3 id="total-items-sold-display" style="margin: 5px 0 0;">0</h3>
+                    </div>
+                    <div style="padding: 10px; background: #fafafa; border-radius: 6px; border-left: 4px solid #e65100;">
+                        <small style="color:#666;">Active Products</small>
+                        <h3 id="total-prod-count" style="margin: 5px 0 0;">0</h3>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Add Product & Teaser Section -->
+            <section class="admin-card">
+                <h3><i class="fas fa-plus-circle"></i> Add New Product / Coming Soon Teaser</h3>
+                <form id="add-product-form">
+                    <input type="text" id="prod-title" placeholder="Product Title" required class="modal-input">
+                    <input type="number" id="prod-price" placeholder="Price (E)" step="0.01" required class="modal-input">
+                    <input type="number" id="prod-stock" placeholder="Initial Stock Quantity" min="0" value="10" required class="modal-input">
+                    
+                    <select id="prod-category" required class="modal-input">
+                        <option value="Handbags">Handbags</option>
+                        <option value="Tote Bags">Tote Bags</option>
+                        <option value="Crossbody Bags">Crossbody Bags</option>
+                        <option value="Backpacks">Backpacks</option>
+                        <option value="Shoulder Bags">Shoulder Bags</option>
+                        <option value="Clutches">Clutches</option>
+                    </select>
+
+                    <label style="display:block; text-align:left; font-size:12px; font-weight:bold; margin-top:10px; color:#444;">
+                        <i class="fas fa-tag"></i> Storefront Availability Status:
+                    </label>
+                    <select id="prod-status" required class="modal-input" style="background:#fff8e1; border:1px solid #ffe082;">
+                        <option value="available">✔ Available Now for Purchase</option>
+                        <option value="coming_soon">🔥 Coming Soon (Teaser Only)</option>
+                    </select>
+                    
+                    <label style="display:block; text-align:left; font-size:12px; font-weight:bold; margin-top:10px; color:#444;">
+                        <i class="fas fa-camera"></i> Upload Image (Device Storage / Camera):
+                    </label>
+                    <input type="file" id="prod-file" accept="image/*" class="modal-input" style="padding:6px;">
+
+                    <small style="display:block; text-align:left; color:#777; margin-bottom:8px;">Or enter an image web link below:</small>
+                    <input type="url" id="prod-image" placeholder="Image URL (Optional)" class="modal-input">
+                    
+                    <button type="submit" class="btn-dark full-btn" style="margin-top:10px; background:#222;">
+                        <i class="fas fa-cloud-upload-alt"></i> SAVE & PUBLISH PRODUCT
+                    </button>
+                </form>
+            </section>
+
+            <!-- Product Inventory Section -->
+            <section class="admin-card">
+                <div class="admin-card-header">
+                    <h3><i class="fas fa-boxes"></i> Product Inventory & Controls</h3>
+                    <button id="reset-defaults-btn" class="btn-small">Reset to Placeholders</button>
+                </div>
+                <div class="table-responsive">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Title</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Stock Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-product-rows">
+                            <!-- JavaScript automatically fills product rows here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Early Access Waitlist Section -->
+            <section class="admin-card">
+                <div class="admin-card-header">
+                    <h3><i class="fas fa-envelope-open-text" style="color:#e65100;"></i> "Coming Soon" Early Access Subscribers</h3>
+                    <button onclick="clearWaitlist()" class="btn-small btn-danger">Clear List</button>
+                </div>
+                <p style="font-size:12px; color:#666; margin-bottom:12px; text-align:left;">Emails collected from visitors who clicked teasers to get notified upon launch.</p>
+                <div class="table-responsive">
+                    <table class="admin-table">
+                        <thead>
+                            <tr style="background:#fff3e0;">
+                                <th>Interested Collection / Item</th>
+                                <th>Customer Email</th>
+                                <th>Date Subscribed</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-waitlist-rows">
+                            <!-- JavaScript automatically fills waitlist rows here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Sales History Section -->
+            <section class="admin-card">
+                <h3><i class="fas fa-file-invoice-dollar"></i> Customer Orders & Sales History</h3>
+                <div class="table-responsive" style="margin-top: 15px;">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Date</th>
+                                <th>Customer</th>
+                                <th>Items</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-sales-rows">
+                            <!-- JavaScript automatically fills sales rows here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script src="script.js"></script> 
+
+</body>
+</html>

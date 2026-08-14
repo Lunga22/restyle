@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Restyle Thrifty</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- Top Announcement Bar -->
+    <div class="top-bar">
+        <span>Welcome to Restyle Thrifty</span>
+        <span>Stylish Bags, Affordable Prices</span>
+        <div class="top-socials">
+            <i class="fab fa-facebook-f" onclick="alert('Redirecting to Facebook...')"></i>
+            <i class="fab fa-instagram" onclick="alert('Redirecting to Instagram...')"></i>
+            <i class="fab fa-tiktok" onclick="alert('Redirecting to TikTok...')"></i>
+        </div>
+    </div>
+
+    <!-- Header / Navbar -->
+    <header>
+        <div class="brand-logo" onclick="window.location.href='index.html'">
+            <h1 class="logo-title">Restyle</h1>
+            <div class="logo-sub">— THRIFTY —</div>
+            <div class="logo-tag">• BAGS & ACCESSORIES •</div>
+        </div>
+        <nav class="nav-links">
+            <a href="index.html">HOME</a>
+            <a href="index.html#categories">SHOP</a>
+            <a href="index.html#new-arrivals">NEW ARRIVALS</a>
+            <a href="about.html" class="active">ABOUT US</a>
+            <a href="#footer">CONTACT</a>
+        </nav>
+        <div class="header-actions">
+            <i class="fas fa-search" id="open-search" title="Search"></i>
+            <i class="far fa-user" id="open-account" title="Account"></i>
+            <div class="cart-wrapper" id="open-cart" title="View Cart">
+                <i class="fas fa-shopping-bag"></i>
+                <span id="cart-count">0</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main About Page Body -->
+    <main class="about-page-wrap" style="max-width: 1100px; margin: 0 auto; padding: 40px 20px;">
+        
+        <!-- About Hero Banner -->
+        <section class="about-hero-clean" style="text-align: center; padding: 50px 20px; background: #fafafa; border-radius: 8px; border: 1px solid #eee; margin-bottom: 40px;">
+            <p style="text-transform: uppercase; font-size: 12px; letter-spacing: 2px; color: #888; margin-bottom: 8px;">Welcome to</p>
+            <h1 style="font-family: 'Cormorant Garamond', serif; font-size: 42px; color: #222; margin-bottom: 10px; font-weight: 700;">RESTYLE THRIFTY</h1>
+            <div style="font-size: 13px; font-weight: 600; letter-spacing: 1.5px; color: #9e6038; text-transform: uppercase; margin-bottom: 15px;">Stylish Bags, Affordable Prices</div>
+            <p style="max-width: 600px; margin: 0 auto; color: #555; font-size: 15px; line-height: 1.6;">Your premier online destination for quality handbags, totes, and accessories designed to fit your unique personal style and budget.</p>
+        </section>
+
+        <!-- Our Story Section -->
+        <section class="about-card-clean" style="background: #fff; padding: 40px; border-radius: 8px; border: 1px solid #eee; margin-bottom: 40px; text-align: center;">
+            <h2 style="font-family: 'Cormorant Garamond', serif; font-size: 28px; color: #222; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px;">Our Story</h2>
+            <p style="max-width: 750px; margin: 0 auto 15px; color: #555; font-size: 15px; line-height: 1.7;">Restyle Thrifty was founded with a singular focus: to make high-quality, fashionable bags accessible to everyone. We believe that looking polished and expressive shouldn't come with an extraordinary price tag, which is why we meticulously curate functional, stylish accessories at price points that make sense.</p>
+            <p style="font-style: italic; color: #9e6038; font-weight: 600; font-size: 16px;">"Style more. Spend less. That's the Restyle way."</p>
+        </section>
+
+        <!-- What We Offer & Why Choose Us -->
+        <section class="about-grid-2" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; margin-bottom: 40px;">
+            <div class="offer-box" style="background: #fff; padding: 30px; border-radius: 8px; border: 1px solid #eee;">
+                <h3 class="about-section-heading" style="font-family: 'Cormorant Garamond', serif; font-size: 24px; margin-bottom: 20px; border-bottom: 2px solid #222; padding-bottom: 8px; font-weight:700;">WHAT WE OFFER</h3>
+                <div class="offer-icons-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                    <div style="display: flex; align-items: center; gap: 10px; font-size: 14px; color: #444;"><i class="fas fa-shopping-bag" style="color: #9e6038;"></i> Handbags</div>
+                    <div style="display: flex; align-items: center; gap: 10px; font-size: 14px; color: #444;"><i class="fas fa-shopping-basket" style="color: #9e6038;"></i> Tote Bags</div>
+                    <div style="display: flex; align-items: center; gap: 10px; font-size: 14px; color: #444;"><i class="fas fa-briefcase" style="color: #9e6038;"></i> Crossbody Bags</div>
+                    <div style="display: flex; align-items: center; gap: 10px; font-size: 14px; color: #444;"><i class="fas fa-user-ninja" style="color: #9e6038;"></i> Backpacks</div>
+                    <div style="display: flex; align-items: center; gap: 10px; font-size: 14px; color: #444;"><i class="fas fa-suitcase" style="color: #9e6038;"></i> Shoulder Bags</div>
+                    <div style="display: flex; align-items: center; gap: 10px; font-size: 14px; color: #444;"><i class="fas fa-plane" style="color: #9e6038;"></i> Travel Bags</div>
+                    <div style="display: flex; align-items: center; gap: 10px; font-size: 14px; color: #444;"><i class="fas fa-envelope" style="color: #9e6038;"></i> Clutches</div>
+                    <div style="display: flex; align-items: center; gap: 10px; font-size: 14px; color: #444;"><i class="fas fa-glasses" style="color: #9e6038;"></i> Accessories</div>
+                </div>
+            </div>
+            
+            <div class="why-box" style="background: #fff; padding: 30px; border-radius: 8px; border: 1px solid #eee;">
+                <h3 class="about-section-heading" style="font-family: 'Cormorant Garamond', serif; font-size: 24px; margin-bottom: 20px; border-bottom: 2px solid #222; padding-bottom: 8px; font-weight:700;">WHY CHOOSE US</h3>
+                <div class="why-checklist" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; font-size: 13px; color: #444;">
+                    <div><i class="far fa-check-circle" style="color: #2e7d32;"></i> Affordable Prices</div>
+                    <div><i class="far fa-check-circle" style="color: #2e7d32;"></i> Quality Assurance</div>
+                    <div><i class="far fa-check-circle" style="color: #2e7d32;"></i> Dedicated Support</div>
+                    <div><i class="far fa-check-circle" style="color: #2e7d32;"></i> Secure Checkout</div>
+                    <div><i class="far fa-check-circle" style="color: #2e7d32;"></i> Modern Curations</div>
+                    <div><i class="far fa-check-circle" style="color: #2e7d32;"></i> Swift Delivery</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Mission, Vision, Values -->
+        <section class="about-grid-3" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 40px;">
+            <div class="mvv-card" style="background: #fafafa; padding: 30px; border-radius: 8px; border: 1px solid #eee; text-align: center;">
+                <div style="font-size: 28px; color: #9e6038; margin-bottom: 12px;"><i class="fas fa-bullseye"></i></div>
+                <h4 style="font-family: 'Cormorant Garamond', serif; font-size: 20px; margin-bottom: 10px; font-weight:700;">OUR MISSION</h4>
+                <p style="font-size: 14px; color: #666; line-height: 1.6;">To empower individuals through accessible fashion by offering dependable, high-value bags backed by seamless customer support.</p>
+            </div>
+            
+            <div class="mvv-card" style="background: #fafafa; padding: 30px; border-radius: 8px; border: 1px solid #eee; text-align: center;">
+                <div style="font-size: 28px; color: #9e6038; margin-bottom: 12px;"><i class="far fa-eye"></i></div>
+                <h4 style="font-family: 'Cormorant Garamond', serif; font-size: 20px; margin-bottom: 10px; font-weight:700;">OUR VISION</h4>
+                <p style="font-size: 14px; color: #666; line-height: 1.6;">To build a widely trusted online fashion brand recognized for affordability, authenticity, and design excellence.</p>
+            </div>
+            
+            <div class="mvv-card" style="background: #fafafa; padding: 30px; border-radius: 8px; border: 1px solid #eee; text-align: center;">
+                <div style="font-size: 28px; color: #9e6038; margin-bottom: 12px;"><i class="far fa-gem"></i></div>
+                <h4 style="font-family: 'Cormorant Garamond', serif; font-size: 20px; margin-bottom: 10px; font-weight:700;">OUR VALUES</h4>
+                <ul style="list-style: none; padding: 0; font-size: 14px; color: #666; line-height: 1.8;">
+                    <li><i class="fas fa-angle-right" style="color: #9e6038;"></i> Uncompromised Quality</li>
+                    <li><i class="fas fa-angle-right" style="color: #9e6038;"></i> Transparent Pricing</li>
+                    <li><i class="fas fa-angle-right" style="color: #9e6038;"></i> Customer-First Service</li>
+                    <li><i class="fas fa-angle-right" style="color: #9e6038;"></i> Sustainable Practice</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- How We Work Section -->
+        <section style="background: #fff; padding: 40px; border-radius: 8px; border: 1px solid #eee; margin-bottom: 40px; text-align: center;">
+            <h3 style="font-family: 'Cormorant Garamond', serif; font-size: 26px; margin-bottom: 30px; font-weight:700; letter-spacing: 1px;">HOW IT WORKS</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                <div style="padding: 20px; background: #fafafa; border-radius: 6px;">
+                    <div style="font-size: 22px; color: #9e6038; margin-bottom: 8px;"><i class="fas fa-search"></i></div>
+                    <strong style="display: block; font-size: 14px; margin-bottom: 5px;">1. BROWSE</strong>
+                    <p style="font-size: 12px; color: #666; margin: 0;">Explore our diverse online handbag collection.</p>
+                </div>
+                <div style="padding: 20px; background: #fafafa; border-radius: 6px;">
+                    <div style="font-size: 22px; color: #9e6038; margin-bottom: 8px;"><i class="fas fa-shopping-cart"></i></div>
+                    <strong style="display: block; font-size: 14px; margin-bottom: 5px;">2. ORDER</strong>
+                    <p style="font-size: 12px; color: #666; margin: 0;">Select your favorite items & place an order.</p>
+                </div>
+                <div style="padding: 20px; background: #fafafa; border-radius: 6px;">
+                    <div style="font-size: 22px; color: #9e6038; margin-bottom: 8px;"><i class="fas fa-box"></i></div>
+                    <strong style="display: block; font-size: 14px; margin-bottom: 5px;">3. PACKAGE</strong>
+                    <p style="font-size: 12px; color: #666; margin: 0;">We process and carefully package your order.</p>
+                </div>
+                <div style="padding: 20px; background: #fafafa; border-radius: 6px;">
+                    <div style="font-size: 22px; color: #9e6038; margin-bottom: 8px;"><i class="fas fa-truck"></i></div>
+                    <strong style="display: block; font-size: 14px; margin-bottom: 5px;">4. DELIVER</strong>
+                    <p style="font-size: 12px; color: #666; margin: 0;">Receive fast, secure delivery right to your door.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Our Commitment & Stay Connected -->
+        <section class="about-grid-2" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-bottom: 40px;">
+            <div style="background: #fff; padding: 30px; border-radius: 8px; border: 1px solid #eee;">
+                <h3 style="font-family: 'Cormorant Garamond', serif; font-size: 22px; margin-bottom: 12px; font-weight:700;"><i class="fas fa-shield-alt" style="color: #9e6038;"></i> OUR COMMITMENT TO YOU</h3>
+                <p style="font-size: 14px; color: #555; line-height: 1.6;">Every single order is verified and packed with care. We are committed to providing a reliable, straightforward shopping process from browsing to checkout and final delivery.</p>
+            </div>
+            
+            <div style="background: #fff; padding: 30px; border-radius: 8px; border: 1px solid #eee; text-align: center;">
+                <h3 style="font-family: 'Cormorant Garamond', serif; font-size: 22px; margin-bottom: 10px; font-weight:700;">STAY CONNECTED</h3>
+                <p style="font-size: 13px; color: #666; margin-bottom: 15px;">Follow Restyle Thrifty across our social channels for stock updates and new arrivals.</p>
+                <div style="display: flex; justify-content: center; gap: 20px; font-size: 18px; color: #222;">
+                    <i class="fab fa-facebook-f" style="cursor:pointer;" onclick="alert('Redirecting to Facebook...')"></i>
+                    <i class="fab fa-instagram" style="cursor:pointer;" onclick="alert('Redirecting to Instagram...')"></i>
+                    <i class="fab fa-tiktok" style="cursor:pointer;" onclick="alert('Redirecting to TikTok...')"></i>
+                </div>
+                <div style="font-size: 12px; font-weight: 600; color: #9e6038; margin-top: 10px;">@restylethrifty</div>
+            </div>
+        </section>
+
+        <!-- Service Features -->
+        <section class="about-bottom-bar" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; background: #fafafa; padding: 20px; border-radius: 8px; border: 1px solid #eee; text-align: center;">
+            <div><i class="fas fa-shield-alt" style="color: #9e6038;"></i> <strong>SECURE PAYMENT</strong><span style="display:block; font-size:11px; color:#777;">100% Protected Checkout</span></div>
+            <div><i class="fas fa-truck" style="color: #9e6038;"></i> <strong>RELIABLE DELIVERY</strong><span style="display:block; font-size:11px; color:#777;">Prompt Shipping</span></div>
+            <div><i class="fas fa-ribbon" style="color: #9e6038;"></i> <strong>QUALITY GUARANTEE</strong><span style="display:block; font-size:11px; color:#777;">Verified Standards</span></div>
+            <div><i class="fas fa-headset" style="color: #9e6038;"></i> <strong>CUSTOMER CARE</strong><span style="display:block; font-size:11px; color:#777;">Direct Support</span></div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer id="footer">
+        <div class="footer-col newsletter-col">
+            <div class="nl-head">
+                <i class="far fa-envelope"></i>
+                <div>
+                    <strong>STAY IN THE LOOP</strong>
+                    <p>Subscribe for new arrivals, special offers and exclusive updates.</p>
+                </div>
+            </div>
+            <form id="newsletter-form" class="nl-form">
+                <input type="email" id="newsletter-email" placeholder="Your email address" required>
+                <button type="submit">SUBSCRIBE</button>
+            </form>
+        </div>
+
+        <div class="footer-col brand-col">
+            <h2 class="logo-title">Restyle</h2>
+            <div class="logo-sub">— THRIFTY —</div>
+            <div class="logo-tag">• BAGS & ACCESSORIES •</div>
+        </div>
+		
+		<div class="footer-col contact-col">
+    <strong>CONTACT & POLICIES</strong>
+    <p style="font-size:12px; margin-top:5px;"><i class="fas fa-map-marker-alt" style="color:#9e6038;"></i> 32 Wattle Street, Dawn Park, Boksburg</p>
+    <p style="font-size:12px;"><i class="fas fa-phone" style="color:#9e6038;"></i> +27 81 538 5051 / +27 73 921 8067</p>
+    <p style="font-size:12px;"><i class="fas fa-envelope" style="color:#9e6038;"></i> gugunyawose6@gmail.com</p>
+    <p style="font-size:12px; color:#d32f2f; font-weight:bold; margin-top:5px;"><i class="fas fa-info-circle"></i> Policy: No Return / No Refund</p>
+</div>
+
+        <div class="footer-col links-col">
+            <strong>QUICK LINKS</strong>
+            <a href="index.html#categories">Shop</a>
+            <a href="index.html#new-arrivals">New Arrivals</a>
+            <a href="about.html">About Us</a>
+            <a href="#footer">Contact Us</a>
+            <a href="#footer">FAQs</a>
+        </div>
+
+        <div class="footer-col links-col">
+            <strong>CUSTOMER CARE</strong>
+            <a href="#">Shipping & Delivery</a>
+            <a href="#">Returns & Exchanges</a>
+            <a href="#">Size Guide</a>
+            <a href="#">Track Your Order</a>
+            <a href="#">Help Center</a>
+        </div>
+
+        <div class="footer-col social-col">
+            <strong>FOLLOW US</strong>
+            <div class="foot-social-icons">
+                <i class="fab fa-facebook-f" onclick="alert('Redirecting to Facebook...')"></i>
+                <i class="fab fa-instagram" onclick="alert('Redirecting to Instagram...')"></i>
+                <i class="fab fa-tiktok" onclick="alert('Redirecting to TikTok...')"></i>
+            </div>
+            <p class="handle">@restylethrifty</p>
+        </div>
+    </footer>
+
+    <div class="copyright-bar">
+        © 2026 Restyle Thrifty. All Rights Reserved.
+    </div>
+
+    <!-- Modals & Cart Drawer -->
+    <div class="cart-drawer" id="cart-drawer">
+        <div class="cart-header">
+            <h3>YOUR SHOPPING CART (<span id="drawer-cart-count">0</span>)</h3>
+            <span class="close-btn" id="close-cart">&times;</span>
+        </div>
+        <div class="cart-items" id="cart-items-container">
+            <p class="empty-msg">Your cart is currently empty.</p>
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total-row">
+                <span>Total:</span>
+                <strong id="cart-total-price">E0.00</strong>
+            </div>
+            <button class="btn-dark full-btn" onclick="checkout()">PROCEED TO CHECKOUT</button>
+        </div>
+    </div>
+    <div class="overlay" id="overlay"></div>
+
+    <div class="modal" id="search-modal">
+        <div class="modal-box">
+            <span class="close-btn" id="close-search">&times;</span>
+            <h3>Search Products</h3>
+            <div class="search-flex">
+                <input type="text" id="search-input" placeholder="Search for handbags, totes, backpacks...">
+                <button onclick="performSearch()"><i class="fas fa-search"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="account-modal">
+        <div class="modal-box">
+            <span class="close-btn" id="close-account">&times;</span>
+            <h3>Customer Login</h3>
+            <form onsubmit="event.preventDefault(); alert('Login successful!'); closeAllModals();">
+                <input type="email" placeholder="Email Address" required class="modal-input">
+                <input type="password" placeholder="Password" required class="modal-input">
+                <button type="submit" class="btn-dark full-btn">SIGN IN</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

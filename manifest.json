@@ -1,0 +1,29 @@
+{
+  "id": "/index.html",
+  "name": "Restyle Thrifty",
+  "short_name": "Re:Thrift",
+  "description": "Browse and shop curated restyled fashion, vintage finds, and new arrivals.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#F5EFE6",
+  "theme_color": "#A7826A",
+  "orientation": "portrait",
+  "scope": "./",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": [
+    "shopping"
+  ]
+}
