@@ -145,7 +145,7 @@ window.renderStorefrontProducts = function() {
                 </div>
                 <div class="product-info">
                     <h4>${product.title}</h4>
-                    <div class="product-price">E${parseFloat(product.price).toFixed(2)}</div>
+                    <div class="product-price">R${parseFloat(product.price).toFixed(2)}</div>
                     
                     <div class="stock-status" style="font-size:11px; margin-bottom:8px; font-weight:bold; color: ${isComingSoon ? '#e65100' : (isOutOfStock ? '#d32f2f' : (stockQty < 5 ? '#e65100' : '#2e7d32'))};">
                         ${isComingSoon ? '⏳ Launching Soon' : (isOutOfStock ? '❌ Out of Stock' : `✔ In Stock: ${stockQty}`)}
@@ -200,7 +200,7 @@ window.filterCategory = function(cat) {
 window.updatePriceFilter = function(val) {
     activeFilters.maxPrice = parseFloat(val);
     const priceDisplay = document.getElementById('price-val-display');
-    if (priceDisplay) priceDisplay.innerText = `E${val}`;
+    if (priceDisplay) priceDisplay.innerText = `R${val}`;
     activeFilters.page = 1;
     renderStorefrontProducts();
 };
@@ -237,7 +237,7 @@ window.resetAllFilters = function() {
     const rangeInput = document.getElementById('price-range');
     if (rangeInput) rangeInput.value = 500;
     const priceDisplay = document.getElementById('price-val-display');
-    if (priceDisplay) priceDisplay.innerText = 'E500';
+    if (priceDisplay) priceDisplay.innerText = 'R500';
     renderStorefrontProducts();
 };
 
@@ -358,11 +358,11 @@ function updateCartUI() {
                             <img src="${item.image}" style="width:40px; height:40px; object-fit:cover; border-radius:4px;">
                             <div>
                                 <strong style="font-size:12px;">${item.title}</strong>
-                                <div style="font-size:11px; color:#666;">Qty: ${itemQty} × E${itemPrice.toFixed(2)}</div>
+                                <div style="font-size:11px; color:#666;">Qty: ${itemQty} × R${itemPrice.toFixed(2)}</div>
                             </div>
                         </div>
                         <div style="text-align:right;">
-                            <strong style="font-size:12px;">E${subtotal.toFixed(2)}</strong>
+                            <strong style="font-size:12px;">R${subtotal.toFixed(2)}</strong>
                             <span onclick="removeFromCart(${idx})" style="color:red; cursor:pointer; margin-left:10px; font-weight:bold;">&times;</span>
                         </div>
                     </div>
@@ -370,7 +370,7 @@ function updateCartUI() {
             }).join('');
         }
     }
-    if (totalPriceEl) totalPriceEl.innerText = `E${total.toFixed(2)}`;
+    if (totalPriceEl) totalPriceEl.innerText = `R${total.toFixed(2)}`;
 }
 
 /* --- CHECKOUT & PAYSTACK PAYMENT --- */
