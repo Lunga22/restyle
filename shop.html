@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop Our Collection - Restyle Thrifty</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+	<script src="https://js.paystack.co/v1/inline.js"></script>
+	<script src="https://js.paystack.co/v1/inline.js"></script>
+    <style>
+        .announcement-bar { background-color: #f7f5f2; padding: 8px 5%; display: flex; justify-content: space-between; font-size: 12px; color: #555; border-bottom: 1px solid #e2ded9; }
+        .shop-hero { background: linear-gradient(rgba(245, 240, 235, 0.8), rgba(245, 240, 235, 0.8)), url('https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=1200') center/cover; text-align: center; padding: 50px 20px; margin-bottom: 30px; }
+        .shop-hero h1 { font-family: 'Playfair Display', Georgia, serif; font-size: 32px; letter-spacing: 2px; margin-bottom: 8px; color: #222; }
+        .shop-layout { display: flex; gap: 30px; padding: 0 5% 50px; }
+        .shop-sidebar { width: 260px; flex-shrink: 0; background: #fdfbf7; padding: 20px; border-radius: 6px; border: 1px solid #eee; font-size: 13px; }
+        .filter-group { margin-bottom: 25px; border-bottom: 1px solid #ebe6df; padding-bottom: 15px; }
+        .filter-title { font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: 1px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .filter-list { list-style: none; padding: 0; margin: 0; }
+        .filter-list li { margin-bottom: 8px; }
+        .filter-list label { cursor: pointer; color: #555; }
+        .color-swatches { display: flex; gap: 8px; flex-wrap: wrap; }
+        .swatch { width: 22px; height: 22px; border-radius: 50%; cursor: pointer; border: 1px solid #ccc; display: inline-block; }
+        .shop-content { flex: 1; }
+        .shop-header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 12px; color: #666; }
+        .products-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+        .product-card { background: #fff; border: 1px solid #f0f0f0; border-radius: 4px; overflow: hidden; position: relative; transition: transform 0.2s, box-shadow 0.2s; }
+        .product-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.08); }
+        .product-img-box { position: relative; aspect-ratio: 1 / 1; background: #fafafa; }
+        .product-img-box img { width: 100%; height: 100%; object-fit: cover; }
+        .product-info { padding: 12px; text-align: left; }
+        .product-info h4 { font-size: 13px; font-weight: 600; margin: 0 0 5px 0; color: #333; }
+        .product-price { font-weight: 700; font-size: 13px; color: #111; margin-bottom: 10px; }
+        
+        /* Pagination Styling */
+        .pagination { display: flex; justify-content: center; gap: 8px; margin-top: 30px; font-size: 13px; }
+        .pagination span { padding: 6px 12px; border: 1px solid #ddd; cursor: pointer; border-radius: 3px; user-select: none; }
+        .pagination span.active { background: #111; color: #fff; border-color: #111; }
+        .pagination span.disabled { opacity: 0.4; cursor: not-allowed; }
+
+        @media (max-width: 992px) {
+            .products-grid-4 { grid-template-columns: repeat(2, 1fr); }
+            .shop-layout { flex-direction: column; }
+            .shop-sidebar { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Announcement Bar -->
+    <div class="announcement-bar">
+        <span><i class="fas fa-truck"></i> Fast Delivery</span>
+        <span><i class="far fa-heart"></i> Stylish Bags, Affordable Prices</span>
+        <span><i class="fas fa-shield-alt"></i> Secure Payment</span>
+    </div>
+
+    <!-- Navigation Header -->
+    <header class="main-header">
+        <div class="logo">
+            <a href="index.html">
+                <h2>Restyle <span class="heart">♥</span></h2>
+                <small>— THRIFTY —</small>
+            </a>
+        </div>
+        <nav class="nav-links">
+            <a href="index.html">HOME</a>
+            <a href="shop.html" class="active">SHOP</a>
+            <a href="index.html#new-arrivals">NEW ARRIVALS</a>
+            <a href="about.html">ABOUT US</a>
+            <a href="#footer">CONTACT</a>
+        </nav>
+        <div class="header-actions">
+            <i class="fas fa-search" id="open-search" title="Search"></i>
+            <div id="account-btn-wrap" class="account-btn-wrap">
+                <i class="far fa-user" id="open-account" title="Account Login"></i>
+                <span id="user-display-name" class="user-display-name"></span>
+            </div>
+            <div class="cart-wrapper" id="open-cart" title="View Cart">
+                <i class="fas fa-shopping-bag"></i>
+                <span id="cart-count">0</span>
+            </div>
+        </div>
+    </header>
+
+    <section class="shop-hero">
+        <h1>SHOP OUR COLLECTION</h1>
+        <p>Find the perfect bag that fits your style and your lifestyle.</p>
+    </section>
+
+    <div class="shop-layout">
+        <!-- Sidebar Filters -->
+        <aside class="shop-sidebar">
+            <div class="filter-group">
+                <div class="filter-title">Filter By <button onclick="resetAllFilters()" style="font-size:10px; background:none; border:none; color:#9e6038; cursor:pointer; text-decoration:underline;">Reset All</button></div>
+            </div>
+
+            <!-- Category -->
+            <div class="filter-group">
+                <div class="filter-title">Category</div>
+                <ul class="filter-list">
+                    <li><label><input type="radio" name="cat" onclick="filterCategory('all')" checked> All Categories</label></li>
+                    <li><label><input type="radio" name="cat" onclick="filterCategory('Handbags')"> Handbags</label></li>
+                    <li><label><input type="radio" name="cat" onclick="filterCategory('Tote Bags')"> Tote Bags</label></li>
+                    <li><label><input type="radio" name="cat" onclick="filterCategory('Crossbody Bags')"> Crossbody Bags</label></li>
+                    <li><label><input type="radio" name="cat" onclick="filterCategory('Backpacks')"> Backpacks</label></li>
+                    <li><label><input type="radio" name="cat" onclick="filterCategory('Shoulder Bags')"> Shoulder Bags</label></li>
+                    <li><label><input type="radio" name="cat" onclick="filterCategory('Clutches')"> Clutches</label></li>
+                </ul>
+            </div>
+
+            <!-- Price Range -->
+            <div class="filter-group">
+                <div class="filter-title">Max Price: <span id="price-val-display" style="color:#9e6038;">R500</span></div>
+                <input type="range" id="price-range" min="80" max="500" value="500" style="width:100%;" oninput="updatePriceFilter(this.value)">
+                <div style="display:flex; justify-content:space-between; margin-top:5px; color:#666; font-size:11px;">
+                    <span>R80</span><span>R500</span>
+                </div>
+            </div>
+
+            <!-- Color Swatches -->
+            <div class="filter-group">
+                <div class="filter-title">Color</div>
+                <div class="color-swatches">
+                    <span class="swatch" style="background:#000;" title="Black" onclick="toggleColorFilter('black', this)"></span>
+                    <span class="swatch" style="background:#8b5a2b;" title="Brown" onclick="toggleColorFilter('brown', this)"></span>
+                    <span class="swatch" style="background:#f5f5dc;" title="Beige" onclick="toggleColorFilter('beige', this)"></span>
+                    <span class="swatch" style="background:#fff;" title="White" onclick="toggleColorFilter('white', this)"></span>
+                    <span class="swatch" style="background:#ffc0cb;" title="Pink" onclick="toggleColorFilter('pink', this)"></span>
+                    <span class="swatch" style="background:#556b2f;" title="Olive" onclick="toggleColorFilter('olive', this)"></span>
+                </div>
+            </div>
+
+            <!-- Material -->
+            <div class="filter-group">
+                <div class="filter-title">Material</div>
+                <ul class="filter-list">
+                    <li><label><input type="checkbox" onchange="toggleMaterialFilter('Leather', this.checked)"> Leather</label></li>
+                    <li><label><input type="checkbox" onchange="toggleMaterialFilter('PU Leather', this.checked)"> PU Leather</label></li>
+                    <li><label><input type="checkbox" onchange="toggleMaterialFilter('Canvas', this.checked)"> Canvas</label></li>
+                    <li><label><input type="checkbox" onchange="toggleMaterialFilter('Fabric', this.checked)"> Fabric</label></li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Main Product Display -->
+        <main class="shop-content">
+            <div class="shop-header-bar">
+                <span id="showing-count">SHOWING PRODUCTS</span>
+            </div>
+
+            <div class="products-grid-4" id="products-container">
+                <!-- Products dynamically rendered by script.js -->
+            </div>
+
+            <!-- Scrollable Page Navigation -->
+            <div class="pagination" id="pagination-container">
+                <!-- JavaScript automatically populates numbers and arrows here -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Contact & Footer -->
+    <footer id="footer">
+        <div class="footer-col brand-col">
+            <h2 class="logo-title">Restyle</h2>
+            <div class="logo-sub">— THRIFTY —</div>
+            <div class="logo-tag">• BAGS & ACCESSORIES •</div>
+        </div>
+
+        <div class="footer-col contact-col">
+            <strong>STORE LOCATION & POLICIES</strong>
+            <p style="font-size:12px; margin-top:5px;"><i class="fas fa-map-marker-alt" style="color:#9e6038;"></i> 32 Wattle Street, Dawn Park, Boksburg</p>
+            <p style="font-size:12px;"><i class="fas fa-phone" style="color:#9e6038;"></i> +27 81 538 5051 / +27 73 921 8067</p>
+            <p style="font-size:12px;"><i class="fas fa-envelope" style="color:#9e6038;"></i> gugunyawose6@gmail.com</p>
+            <p style="font-size:12px; color:#d32f2f; font-weight:bold; margin-top:5px;"><i class="fas fa-info-circle"></i> Policy: No Return / No Refund</p>
+        </div>
+
+        <div class="footer-col links-col">
+            <strong>QUICK LINKS</strong>
+            <a href="shop.html">Shop All</a>
+            <a href="about.html">About Us</a>
+            <a href="#footer">Contact Us</a>
+        </div>
+    </footer>
+
+    <div class="copyright-bar">
+        © 2026 Restyle Thrifty. All Rights Reserved.
+    </div>
+
+    <!-- Modals & Cart Drawer -->
+    <div class="cart-drawer" id="cart-drawer">
+        <div class="cart-header">
+            <h3>YOUR SHOPPING CART (<span id="drawer-cart-count">0</span>)</h3>
+            <span class="close-btn" id="close-cart">&times;</span>
+        </div>
+        <div class="cart-items" id="cart-items-container">
+            <p class="empty-msg">Your cart is currently empty.</p>
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total-row">
+                <span>Total:</span>
+                <strong id="cart-total-price">R0.00</strong>
+            </div>
+            <button class="btn-dark full-btn" onclick="checkout()">PROCEED TO CHECKOUT</button>
+        </div>
+    </div>
+    <div class="overlay" id="overlay"></div>
+                                 
+							
+								 
+    <div class="modal" id="search-modal">
+        <div class="modal-box">
+            <span class="close-btn" id="close-search">&times;</span>
+            <h3>Search Products</h3>
+            <div class="search-flex" style="display:flex; gap:10px;">
+                <input type="text" id="search-input" placeholder="Search for handbags, totes, backpacks..." style="flex:1; padding:8px;">
+                <button onclick="performSearch()" class="btn-dark"><i class="fas fa-search"></i></button>
+            </div>
+        </div>
+    </div>
+	
+	      	 <!--Deliveries and Payment -->
+			 
+			 <div id="checkout-modal" class="modal" style="display:none;">
+    <div class="modal-content" style="padding:20px; background:#fff; max-width:450px; margin:auto; border-radius:8px;">
+        <span class="close-btn" onclick="closeAllModals()" style="float:right; cursor:pointer; font-size:20px;">&times;</span>
+        <h3 style="margin-top:0;">Delivery & Payment</h3>
+        <p style="font-size:11px; color:#c62828; font-weight:bold; margin-bottom:12px;">* All fields are required. Store Policy: No Return, No Refund.</p>
+
+        <!-- Mandatory Inputs -->
+        <input type="text" id="checkout-name" placeholder="Full Name *" required style="width:100%; margin-bottom:8px; padding:9px; box-sizing:border-box; border:1px solid #ccc; border-radius:4px; font-size:13px;">
+        <input type="email" id="checkout-email" placeholder="Email Address *" required style="width:100%; margin-bottom:8px; padding:9px; box-sizing:border-box; border:1px solid #ccc; border-radius:4px; font-size:13px;">
+        <input type="tel" id="checkout-phone" placeholder="Phone / WhatsApp Number *" required style="width:100%; margin-bottom:8px; padding:9px; box-sizing:border-box; border:1px solid #ccc; border-radius:4px; font-size:13px;">
+
+        <!-- Delivery Selection -->
+        <label style="font-size:12px; font-weight:bold; display:block; margin-top:6px; margin-bottom:4px;">Delivery Method *:</label>
+        <select id="checkout-delivery-method" onchange="updateCheckoutTotals()" required style="width:100%; margin-bottom:8px; padding:9px; box-sizing:border-box; border:1px solid #ccc; border-radius:4px; font-size:13px;">
+            <option value="pickup">Local Pickup (R0.00)</option>
+            <option value="paxi">PAXI Point-to-Point</option>
+            <option value="pudo_locker">PUDO Locker-to-Locker</option>
+            <option value="pudo_door">PUDO Locker-to-Door</option>
+        </select>
+
+        <textarea id="checkout-address" placeholder="Physical Address OR Paxi / Pudo Locker Store Name & Code *" required style="width:100%; margin-bottom:8px; padding:9px; box-sizing:border-box; height:60px; border:1px solid #ccc; border-radius:4px; font-size:12px; resize:vertical;"></textarea>
+
+        <!-- Live Totals Display -->
+        <div style="margin-top:10px; display:flex; justify-content:space-between; font-size:13px;">
+            <span>Shipping Fee:</span>
+            <strong id="checkout-shipping-cost">R0.00 (Free)</strong>
+        </div>
+        <div style="margin-top:4px; display:flex; justify-content:space-between; font-size:16px; border-bottom:1px solid #eee; padding-bottom:8px;">
+            <span>Grand Total:</span>
+            <strong id="checkout-grand-total">R0.00</strong>
+        </div>
+
+        <!-- Action Buttons -->
+        <div style="display:flex; flex-direction:column; gap:8px; margin-top:12px;">
+            <button type="button" class="btn-dark full-btn" onclick="payWithPaystack()" style="padding:10px; cursor:pointer; font-weight:bold; display:flex; align-items:center; justify-content:center; gap:8px;">
+                <i class="fas fa-credit-card"></i> Pay Online (Paystack)
+            </button>
+
+            <button type="button" class="btn-primary full-btn" onclick="toggleEftDetails()" style="padding:10px; cursor:pointer; font-weight:bold; background:#444; border-color:#444; color:#fff; display:flex; align-items:center; justify-content:center; gap:8px;">
+                <i class="fas fa-university"></i> Manual Bank Transfer (EFT)
+            </button>
+        </div>
+
+        <!-- Hidden Bank Details -->
+        <div id="eft-details" style="display:none; margin-top:12px; padding:12px; background:#f9f9f9; border:1px solid #ddd; border-radius:4px; font-size:12px;">
+            <strong>Banking Details for Manual Payment:</strong>
+            <p style="margin:3px 0;"><strong>Bank:</strong> Capitec Bank / FNB</p>
+            <p style="margin:3px 0;"><strong>Account Name:</strong> Restyle Thrifty</p>
+            <p style="margin:3px 0;"><strong>Account Number:</strong> 1234567890</p>
+            <p style="margin:3px 0;"><strong>Branch Code:</strong> 470010</p>
+            <p style="margin:3px 0; color:#d32f2f;"><strong>Reference:</strong> Use Your Phone Number</p>
+            <hr style="margin:8px 0; border:0; border-top:1px solid #ccc;">
+            <button type="button" class="btn-dark full-btn" onclick="completeEftOrder()" style="padding:9px; font-size:12px; width:100%; cursor:pointer;">
+                CONFIRM EFT ORDER
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="receipt-modal" class="modal" style="display:none;">
+    <div class="modal-content" style="padding:20px; background:#fff; max-width:400px; margin:auto; border-radius:8px; text-align:center;">
+        <span class="close-btn" onclick="closeAllModals()" style="float:right; cursor:pointer;">&times;</span>
+        <h3>Order Confirmation</h3>
+        <div id="receipt-details-content"></div>
+        <div id="whatsapp-btn-container"></div>
+    </div>
+</div>
+   
+    <script src="script.js"></script>
+</body>
+</html>
