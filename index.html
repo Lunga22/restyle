@@ -29,6 +29,15 @@
         </div>
     </div>
 
+	<!-- Custom PWA Install Banner -->
+<div id="pwa-banner" class="pwa-banner">
+  <div class="pwa-banner-content">
+    <span>✨ Install the <strong>Restyle</strong> app for a smoother shop experience!</span>
+    <button id="pwa-install-btn" class="pwa-btn">Install</button>
+    <button id="pwa-close-btn" class="pwa-close" onclick="closePwaBanner()">&times;</button>
+  </div>
+</div>
+	
     <!-- Header / Navbar -->
     <header>
         <div class="brand-logo" onclick="scrollToSection('home')">
@@ -395,7 +404,44 @@
         <div id="whatsapp-btn-container"></div>
     </div>
 </div>
+
+	<script>
+  let deferredPrompt;
+  const pwaBanner = document.getElementById('pwa-banner');
+  const installBtn = document.getElementById('pwa-install-btn');
+
+  // Hide banner if app is already opened inside installed standalone app
+  if (window.matchMedia('(display-mode: standalone)').matches) {
+    pwaBanner.style.display = 'none';
+  }
+
+  // Catch Android Chrome install event
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    pwaBanner.style.display = 'block';
+  });
+
+  // Handle click
+  installBtn.addEventListener('click', async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        pwaBanner.style.display = 'none';
+      }
+      deferredPrompt = null;
+    } else {
+      // Fallback message for iOS / manual installs
+      alert("To install Restyle on iPhone: Tap the Share button at the bottom of Safari, then choose 'Add to Home Screen'.");
+    }
+  });
+
+  function closePwaBanner() {
+    pwaBanner.style.display = 'none';
+  }
+</script>
      
-    <script src="script.js"></script>
+    <script src="script.js"></script>	
 </body>
 </html>
