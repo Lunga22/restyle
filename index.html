@@ -404,44 +404,53 @@
         <div id="whatsapp-btn-container"></div>
     </div>
 </div>
+ 
+<script>
+  // 1. Ensure Service Worker is active (Required for install prompt)
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js').catch(err => {
+      console.log('Service Worker registration failed:', err);
+    });
+  }
 
-	<script>
   let deferredPrompt;
   const pwaBanner = document.getElementById('pwa-banner');
   const installBtn = document.getElementById('pwa-install-btn');
 
-  // Hide banner if app is already opened inside installed standalone app
+  // Hide banner if app is ALREADY running as an installed app
   if (window.matchMedia('(display-mode: standalone)').matches) {
-    pwaBanner.style.display = 'none';
+    if (pwaBanner) pwaBanner.style.display = 'none';
   }
 
-  // Catch Android Chrome install event
+  // 2. Capture the install event when Chrome/Android gives the green light
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
-    pwaBanner.style.display = 'block';
+    if (pwaBanner) pwaBanner.style.display = 'block';
   });
 
-  // Handle click
-  installBtn.addEventListener('click', async () => {
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      if (outcome === 'accepted') {
-        pwaBanner.style.display = 'none';
+  // 3. Handle click event
+  if (installBtn) {
+    installBtn.addEventListener('click', async () => {
+      if (deferredPrompt) {
+        // Trigger native browser install window
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+          if (pwaBanner) pwaBanner.style.display = 'none';
+        }
+        deferredPrompt = null;
+      } else {
+        // Fallback popup if browser hasn't loaded the event yet or on iOS
+        alert("To install Restyle Thrifty:\n\n• On Android: Tap the 3 dots in top-right corner of Chrome → select 'Install app' or 'Add to Home screen'.\n\n• On iPhone: Tap the Share button in Safari → select 'Add to Home Screen'.");
       }
-      deferredPrompt = null;
-    } else {
-      // Fallback message for iOS / manual installs
-      alert("To install Restyle on iPhone: Tap the Share button at the bottom of Safari, then choose 'Add to Home Screen'.");
-    }
-  });
+    });
+  }
 
   function closePwaBanner() {
-    pwaBanner.style.display = 'none';
+    if (pwaBanner) pwaBanner.style.display = 'none';
   }
-</script>
-     
+</script>	
     <script src="script.js"></script>	
 </body>
 </html>
