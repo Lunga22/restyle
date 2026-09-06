@@ -608,6 +608,13 @@ html, body {
   function closePwaBanner() {
     if (pwaBanner) pwaBanner.style.display = 'none';
   }
+	// Handles active state switching when a category pill is tapped
+  document.querySelectorAll('.cat-pill').forEach(pill => {
+    pill.addEventListener('click', function() {
+      document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
 </script>
     <script src="script.js"></script>	
 </body>
