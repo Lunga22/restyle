@@ -8,33 +8,32 @@
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Table & Modal Structural Alignment Styles -->
+    <!-- Custom Layout Fixes (Ensures perfect alignment without touching JS) -->
     <style>
-        /* Strict Table Column Alignment */
         .table-responsive {
             width: 100%;
             overflow-x: auto;
             background: #ffffff;
-            border-radius: 6px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
 
         .admin-table {
             width: 100%;
             border-collapse: collapse;
             text-align: left;
-            font-size: 13px;
+            font-size: 14px;
         }
 
         .admin-table th, 
         .admin-table td {
-            padding: 12px 14px;
+            padding: 12px 16px;
             vertical-align: middle;
             border-bottom: 1px solid #eee;
-            white-space: nowrap;
         }
 
         .admin-table th {
-            background-color: #fcfcfc;
+            background-color: #fafafa;
             font-weight: 700;
             color: #333;
             text-transform: uppercase;
@@ -42,28 +41,25 @@
             letter-spacing: 0.5px;
         }
 
-        /* Product Table Specific Column Alignment */
-        .admin-table td:nth-child(1) { width: 60px; text-align: center; } /* Image */
-        .admin-table td:nth-child(2) { font-weight: 600; color: #222; }   /* Title */
-        .admin-table td:nth-child(3) { color: #666; }                     /* Category */
-        .admin-table td:nth-child(4) { font-weight: 600; color: #111; }   /* Price */
-        .admin-table td:nth-child(5) { width: 100px; }                    /* Stock Status */
-        .admin-table td:nth-child(6) { width: 140px; text-align: right; } /* Actions */
+        /* Fixed 5-Column Grid Widths matching script.js */
+        .admin-table th:nth-child(1), .admin-table td:nth-child(1) { width: 70px; text-align: center; } /* Image */
+        .admin-table th:nth-child(2), .admin-table td:nth-child(2) { font-weight: 600; color: #222; }   /* Title */
+        .admin-table th:nth-child(3), .admin-table td:nth-child(3) { font-weight: 600; color: #555; }   /* Price */
+        .admin-table th:nth-child(4), .admin-table td:nth-child(4) { width: 110px; text-align: center; }/* Stock Input */
+        .admin-table th:nth-child(5), .admin-table td:nth-child(5) { width: 140px; text-align: right; } /* Actions */
 
-        /* Image styling inside rows */
-        .admin-table img, .table-img {
-            width: 44px;
-            height: 44px;
+        .admin-table img {
+            width: 48px;
+            height: 48px;
             object-fit: cover;
-            border-radius: 4px;
+            border-radius: 6px;
             border: 1px solid #e0e0e0;
             display: block;
             margin: 0 auto;
         }
 
-        /* Stock Input Box */
         .admin-table input[type="number"] {
-            width: 65px;
+            width: 60px;
             padding: 6px;
             border: 1px solid #ccc;
             border-radius: 4px;
@@ -71,44 +67,6 @@
             font-weight: 600;
         }
 
-        /* Action Buttons */
-        .action-cell, .action-btns {
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            gap: 8px;
-        }
-
-        .btn-edit {
-            background-color: #2196F3;
-            color: #ffffff;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .btn-delete, .btn-danger-text {
-            background: none;
-            border: none;
-            color: #d32f2f;
-            cursor: pointer;
-            font-weight: 700;
-            font-size: 12px;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .btn-edit:hover { background-color: #1976D2; }
-        .btn-delete:hover { color: #b71c1c; text-decoration: underline; }
-
-        /* Modal Overlay & Card Styling */
         .overlay {
             display: none;
             position: fixed;
@@ -116,16 +74,6 @@
             width: 100vw; height: 100vh;
             background: rgba(0, 0, 0, 0.5);
             z-index: 1001;
-        }
-
-        .modal-input {
-            width: 100%;
-            padding: 8px 10px;
-            margin-top: 4px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 13px;
-            box-sizing: border-box;
         }
     </style>
 </head>
@@ -140,7 +88,6 @@
                 <input type="password" id="admin-pass-input" placeholder="Enter Admin Password" required class="modal-input">
                 <button type="submit" class="btn-dark full-btn">LOGIN TO DASHBOARD</button>
             </form>
-            <p style="font-size: 11px; margin-top: 10px; color: #888;"> <strong></strong></p>
         </div>
     </div>
 
@@ -178,7 +125,7 @@
                 </div>
             </section>
 
-            <!-- Add Product & Teaser Section -->
+            <!-- Add Product Section -->
             <section class="admin-card">
                 <h3><i class="fas fa-plus-circle"></i> Add New Product / Coming Soon Teaser</h3>
                 <form id="add-product-form">
@@ -204,7 +151,7 @@
                     </select>
                     
                     <label style="display:block; text-align:left; font-size:12px; font-weight:bold; margin-top:10px; color:#444;">
-                        <i class="fas fa-camera"></i> Upload Image (Device Storage / Camera):
+                        <i class="fas fa-camera"></i> Upload Image:
                     </label>
                     <input type="file" id="prod-file" accept="image/*" class="modal-input" style="padding:6px;">
 
@@ -217,7 +164,7 @@
                 </form>
             </section>
 
-            <!-- Product Inventory Section -->
+            <!-- Product Inventory Table (Aligned to 5 Columns) -->
             <section class="admin-card">
                 <div class="admin-card-header">
                     <h3><i class="fas fa-boxes"></i> Product Inventory & Controls</h3>
@@ -229,14 +176,13 @@
                             <tr>
                                 <th>Image</th>
                                 <th>Title</th>
-                                <th>Category</th>
                                 <th>Price</th>
-                                <th>Stock Status</th>
+                                <th style="text-align: center;">Stock</th>
                                 <th style="text-align: right;">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="admin-product-rows">
-                            <!-- JavaScript automatically fills product rows here -->
+                            <!-- JS fills rows here -->
                         </tbody>
                     </table>
                 </div>
@@ -245,21 +191,20 @@
             <!-- Early Access Waitlist Section -->
             <section class="admin-card">
                 <div class="admin-card-header">
-                    <h3><i class="fas fa-envelope-open-text" style="color:#e65100;"></i> "Coming Soon" Early Access Subscribers</h3>
+                    <h3><i class="fas fa-envelope-open-text" style="color:#e65100;"></i> "Coming Soon" Subscribers</h3>
                     <button onclick="clearWaitlist()" class="btn-small btn-danger">Clear List</button>
                 </div>
-                <p style="font-size:12px; color:#666; margin-bottom:12px; text-align:left;">Emails collected from visitors who clicked teasers to get notified upon launch.</p>
                 <div class="table-responsive">
                     <table class="admin-table">
                         <thead>
                             <tr style="background:#fff3e0;">
-                                <th>Interested Collection / Item</th>
-                                <th>Customer Email</th>
-                                <th>Date Subscribed</th>
+                                <th>Item</th>
+                                <th>Email</th>
+                                <th>Date</th>
                             </tr>
                         </thead>
                         <tbody id="admin-waitlist-rows">
-                            <!-- JavaScript automatically fills waitlist rows here -->
+                            <!-- JS fills rows here -->
                         </tbody>
                     </table>
                 </div>
@@ -267,7 +212,7 @@
 
             <!-- Sales History Section -->
             <section class="admin-card">
-                <h3><i class="fas fa-file-invoice-dollar"></i> Customer Orders & Sales History</h3>
+                <h3><i class="fas fa-file-invoice-dollar"></i> Customer Orders</h3>
                 <div class="table-responsive" style="margin-top: 15px;">
                     <table class="admin-table">
                         <thead>
@@ -280,7 +225,7 @@
                             </tr>
                         </thead>
                         <tbody id="admin-sales-rows">
-                            <!-- JavaScript automatically fills sales rows here -->
+                            <!-- JS fills rows here -->
                         </tbody>
                     </table>
                 </div>
@@ -292,44 +237,30 @@
     <script src="script.js"></script> 
 
     <!-- Edit Product Modal Popup -->
-    <div id="edit-product-modal" class="modal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; padding: 25px; border-radius: 8px; z-index: 1002; width: 90%; max-width: 440px; box-shadow: 0 10px 30px rgba(0,0,0,0.25);">
+    <div id="edit-product-modal" class="modal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; padding: 25px; border-radius: 8px; z-index: 1002; width: 90%; max-width: 420px; box-shadow: 0 10px 30px rgba(0,0,0,0.25);">
         <div class="modal-content" style="position: relative;">
-            <span class="close-btn" onclick="closeEditModal()" style="position: absolute; right: 0; top: -10px; cursor: pointer; font-size: 24px; font-weight: bold; color: #888;">&times;</span>
-            <h3 style="margin-bottom: 15px; text-transform: uppercase; font-size: 16px; color: #222;"><i class="fas fa-edit"></i> Edit Product Details</h3>
+            <span class="close-btn" onclick="closeEditModal()" style="position: absolute; right: 0; top: -10px; cursor: pointer; font-size: 24px; font-weight: bold;">&times;</span>
+            <h3 style="margin-bottom: 15px; text-transform: uppercase; font-size: 16px;"><i class="fas fa-edit"></i> Edit Product</h3>
             
             <form id="edit-product-form">
-                <!-- Hidden input to store product ID -->
                 <input type="hidden" id="edit-prod-id">
 
                 <label style="display:block; text-align:left; font-size:12px; font-weight:bold; margin-top:10px; color:#444;">Product Title:</label>
-                <input type="text" id="edit-prod-title" required class="modal-input">
-
-                <label style="display:block; text-align:left; font-size:12px; font-weight:bold; margin-top:10px; color:#444;">Category:</label>
-                <select id="edit-prod-category" class="modal-input">
-                    <option value="Handbags">Handbags</option>
-                    <option value="Tote Bags">Tote Bags</option>
-                    <option value="Crossbody Bags">Crossbody Bags</option>
-                    <option value="Backpacks">Backpacks</option>
-                    <option value="Shoulder Bags">Shoulder Bags</option>
-                    <option value="Clutches">Clutches</option>
-                </select>
+                <input type="text" id="edit-prod-title" required class="modal-input" style="width:100%; padding:8px; margin-top:4px; border:1px solid #ccc; border-radius:4px;">
 
                 <label style="display:block; text-align:left; font-size:12px; font-weight:bold; margin-top:10px; color:#444;">Price (R):</label>
-                <input type="number" id="edit-prod-price" step="0.01" required class="modal-input">
+                <input type="number" id="edit-prod-price" step="0.01" required class="modal-input" style="width:100%; padding:8px; margin-top:4px; border:1px solid #ccc; border-radius:4px;">
 
                 <label style="display:block; text-align:left; font-size:12px; font-weight:bold; margin-top:10px; color:#444;">Stock Quantity:</label>
-                <input type="number" id="edit-prod-stock" min="0" required class="modal-input">
+                <input type="number" id="edit-prod-stock" min="0" required class="modal-input" style="width:100%; padding:8px; margin-top:4px; border:1px solid #ccc; border-radius:4px;">
 
                 <label style="display:block; text-align:left; font-size:12px; font-weight:bold; margin-top:10px; color:#444;">Availability Status:</label>
-                <select id="edit-prod-status" required class="modal-input" style="background:#fff8e1;">
+                <select id="edit-prod-status" required class="modal-input" style="width:100%; padding:8px; margin-top:4px; border:1px solid #ccc; border-radius:4px; background:#fff8e1;">
                     <option value="available">✔ Available Now for Purchase</option>
                     <option value="coming_soon">🔥 Coming Soon (Teaser Only)</option>
                 </select>
 
-                <label style="display:block; text-align:left; font-size:12px; font-weight:bold; margin-top:10px; color:#444;">Image URL:</label>
-                <input type="url" id="edit-prod-image" placeholder="Image Web Address" class="modal-input">
-
-                <button type="submit" class="btn-dark full-btn" style="margin-top: 20px; background: #222; color: #fff; width: 100%; padding: 11px; border: none; font-weight: 600; cursor: pointer; border-radius:4px;">
+                <button type="submit" class="btn-dark full-btn" style="margin-top: 20px; background: #222; color: #fff; width: 100%; padding: 10px; border: none; font-weight: 600; cursor: pointer; border-radius:4px;">
                     <i class="fas fa-save"></i> UPDATE PRODUCT
                 </button>
             </form>
