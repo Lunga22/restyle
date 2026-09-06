@@ -1844,3 +1844,41 @@ button, input, select, textarea, a {
         height: 220px !important;
     }
 }
+
+.pwa-banner {
+  background-color: #1A1310;
+  color: #FFF3DF;
+  border-bottom: 1px solid #C88A6E;
+  padding: 10px 15px;
+  font-size: 13px;
+  position: relative;
+  z-index: 9999;
+}
+
+.pwa-banner-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.pwa-btn {
+  background: linear-gradient(135deg, #E8C39E, #C88A6E);
+  color: #1A1310;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.pwa-close {
+  background: none;
+  border: none;
+  color: #E8C39E;
+  font-size: 18px;
+  cursor: pointer;
+}
