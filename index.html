@@ -15,6 +15,68 @@
 	<script src="https://js.paystack.co/v1/inline.js"></script>
      <link rel="manifest" href="manifest.json">
 	 <script src="https://js.paystack.co/v1/inline.js"></script>
+
+	<style>
+    /* Reset & Base Styles */
+    *, *::before, *::after {
+      box-sizing: border-box !important;
+    }
+
+    html, body {
+      width: 100% !important;
+      max-width: 100vw !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      overflow-x: hidden !important;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    /* PWA Banner Styles */
+    .pwa-banner {
+      background-color: #1A1310;
+      color: #FFF3DF;
+      border-bottom: 1px solid #C88A6E;
+      padding: 10px 15px;
+    }
+
+    .pwa-btn {
+      background: linear-gradient(135deg, #E8C39E, #C88A6E);
+      color: #1A1310;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-weight: bold;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    /* Mobile Responsive Overrides */
+    @media (max-width: 768px) {
+      body {
+        font-size: 18px;
+        line-height: 1.6;
+      }
+
+      /* Stack items vertically so nothing stretches off-screen */
+      .product-grid, .grid, .products, .row {
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        gap: 20px !important;
+      }
+
+      img, svg, video {
+        max-width: 100% !important;
+        height: auto !important;
+      }
+
+      button, .btn, nav a {
+        font-size: 1rem !important;
+        padding: 12px 20px;
+      }
+    }
+  </style>
+	
 </head>
 <body>
 
