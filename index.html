@@ -91,11 +91,11 @@
         </div>
     </div>
 
-	<!-- Custom PWA Install Banner -->
+<!-- Custom PWA Install Banner with Direct Download -->
 <div id="pwa-banner" class="pwa-banner">
   <div class="pwa-banner-content">
-    <span>✨ Install the <strong>Restyle</strong> app for a smoother shop experience!</span>
-    <button id="pwa-install-btn" class="pwa-btn">Install</button>
+    <span>✨ Install <strong>Restyle</strong> on your phone!</span>
+    <a id="pwa-install-btn" href="restyle.apk" download="restyle.apk" class="pwa-btn">Download App</a>
     <button id="pwa-close-btn" class="pwa-close" onclick="closePwaBanner()">&times;</button>
   </div>
 </div>
@@ -468,51 +468,54 @@
 </div>
  
 <script>
-  // 1. Ensure Service Worker is active (Required for install prompt)
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js').catch(err => {
-      console.log('Service Worker registration failed:', err);
-    });
-  }
-
   let deferredPrompt;
   const pwaBanner = document.getElementById('pwa-banner');
   const installBtn = document.getElementById('pwa-install-btn');
 
-  // Hide banner if app is ALREADY running as an installed app
+  // Register Service Worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW Error:', err));
+  }
+
+  // Hide banner if app is ALREADY open as an installed app
   if (window.matchMedia('(display-mode: standalone)').matches) {
     if (pwaBanner) pwaBanner.style.display = 'none';
   }
 
-  // 2. Capture the install event when Chrome/Android gives the green light
+  // Catch native PWA prompt if browser supports it
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
-    if (pwaBanner) pwaBanner.style.display = 'block';
   });
 
-  // 3. Handle click event
   if (installBtn) {
-    installBtn.addEventListener('click', async () => {
+    installBtn.addEventListener('click', (e) => {
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
       if (deferredPrompt) {
-        // Trigger native browser install window
+        // Option A: Trigger native PWA installer if available
+        e.preventDefault();
         deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        if (outcome === 'accepted') {
-          if (pwaBanner) pwaBanner.style.display = 'none';
-        }
-        deferredPrompt = null;
-      } else {
-        // Fallback popup if browser hasn't loaded the event yet or on iOS
-        alert("To install Restyle Thrifty:\n\n• On Android: Tap the 3 dots in top-right corner of Chrome → select 'Install app' or 'Add to Home screen'.\n\n• On iPhone: Tap the Share button in Safari → select 'Add to Home Screen'.");
-      }
+        deferredPrompt.userChoice.then(({ outcome }) => {
+          if (outcome === 'accepted') {
+            if (pwaBanner) pwaBanner.style.display = 'none';
+          }
+          deferredPrompt = null;
+        });
+      } else if (isIOS) {
+        // Option B: Show iPhone instructions
+        e.preventDefault();
+        alert("To install Restyle on iPhone:\n\n1. Tap the Share button at the bottom of Safari.\n2. Scroll down and tap 'Add to Home Screen'.");
+      } 
+      // Option C: If on Android and native prompt isn't ready, 
+      // clicking the button will automatically download 'restyle.apk'!
     });
   }
 
   function closePwaBanner() {
     if (pwaBanner) pwaBanner.style.display = 'none';
   }
-</script>	
+</script>
     <script src="script.js"></script>	
 </body>
 </html>
