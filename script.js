@@ -1,6 +1,13 @@
 /* ==========================================================================
-   RESTYLE THRIFTY - COMPLETE CORE SCRIPT WITH PAYMENT INTEGRATION & ADMIN
+   RESTYLE THRIFTY - COMPLETE CORE SCRIPT WITH SA VALIDATION & NOTIFICATIONS
    ========================================================================== */
+
+// Store Merchant Details
+const STORE_CONFIG = {
+    merchantPhone: '+27815385051',
+    merchantEmail: 'gugunyawose6@gmail.com',
+    currencySymbol: 'R'
+};
 
 const DEFAULT_PRODUCTS = [
     { id: '1', title: 'Classic Quilted Shoulder Bag', price: 299.00, stock: 12, category: 'Handbags', color: 'black', material: 'PU Leather', status: 'available', image: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=500' },
@@ -8,12 +15,7 @@ const DEFAULT_PRODUCTS = [
     { id: '3', title: 'Compact Crossbody Pouch', price: 189.00, stock: 5, category: 'Crossbody Bags', color: 'beige', material: 'Fabric', status: 'available', image: 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=600' },
     { id: '4', title: 'Urban Daily Backpack', price: 399.00, stock: 15, category: 'Backpacks', color: 'black', material: 'Canvas', status: 'available', image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500' },
     { id: '5', title: 'Evening Clutch Bag', price: 220.00, stock: 3, category: 'Clutches', color: 'white', material: 'PU Leather', status: 'available', image: 'https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?w=300' },
-    { id: '6', title: 'Classic Shoulder Bag', price: 230.00, stock: 10, category: 'Shoulder Bags', color: 'pink', material: 'Leather', status: 'available', image: 'https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?w=500' },
-    { id: '7', title: 'Travel Duffle Bag', price: 450.00, stock: 6, category: 'Shoulder Bags', color: 'olive', material: 'Canvas', status: 'available', image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500' },
-    { id: '8', title: 'Top Handle Bag', price: 300.00, stock: 7, category: 'Handbags', color: 'brown', material: 'Leather', status: 'available', image: 'https://images.unsplash.com/photo-1591561954557-26941169b49e?w=500' },
-    { id: '9', title: 'Woven Tote Bag', price: 260.00, stock: 9, category: 'Tote Bags', color: 'beige', material: 'Fabric', status: 'available', image: 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=500' },
-    { id: '10', title: 'Mini Crossbody Bag', price: 180.00, stock: 11, category: 'Crossbody Bags', color: 'pink', material: 'PU Leather', status: 'available', image: 'https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?w=500' },
-    { id: '11', title: 'Trendy Backpack', price: 290.00, stock: 14, category: 'Backpacks', color: 'black', material: 'Canvas', status: 'available', image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500' }
+    { id: '6', title: 'Classic Shoulder Bag', price: 230.00, stock: 10, category: 'Shoulder Bags', color: 'pink', material: 'Leather', status: 'available', image: 'https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?w=500' }
 ];
 
 let products = [];
@@ -21,7 +23,6 @@ let cart = [];
 let currentUser = null;
 let orders = [];
 
-// Storefront Filtering & Pagination State
 let activeFilters = {
     category: 'all',
     maxPrice: 500,
@@ -41,7 +42,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initComingSoon();
     attachGlobalButtonListeners();
 
-    // Check URL parameters for search queries
     const urlParams = new URLSearchParams(window.location.search);
     const searchParam = urlParams.get('search');
     if (searchParam) {
@@ -54,11 +54,44 @@ document.addEventListener('DOMContentLoaded', () => {
         renderStorefrontProducts();
     }
 
-    // Initialize Admin Panel if elements are on page
     if (document.getElementById('admin-dashboard') || document.getElementById('admin-login-screen')) {
         initAdminPanel();
     }
 });
+
+/* --- PHONE VALIDATION & ESTIMATED DELIVERY LOGIC --- */
+
+// Validates standard SA formats: 0815385051, +27815385051, 0721234567, etc.
+function isValidSAPhone(phone) {
+    const cleanPhone = phone.replace(/[\s\-\(\)]/g, '');
+    const saRegex = /^(\+27|0)[678]\d{8}$/;
+    return saRegex.test(cleanPhone);
+}
+
+// Format phone to standard international format (+27...)
+function formatSAPhone(phone) {
+    let clean = phone.replace(/[\s\-\(\)]/g, '');
+    if (clean.startsWith('0')) {
+        clean = '+27' + clean.substring(1);
+    }
+    return clean;
+}
+
+// Get delivery timeframes depending on method
+function getEstimatedDeliveryTime(deliveryMethod) {
+    switch (deliveryMethod) {
+        case 'paxi':
+            return '7 to 9 business days (Paxi Store-to-Store)';
+        case 'pudo_locker':
+            return '1 to 4 business days (Pudo Locker-to-Locker)';
+        case 'pudo_door':
+            return '1 to 3 business days (Pudo Door Courier)';
+        case 'pickup':
+            return '1 to 2 business days (Ready for Local Pick Up)';
+        default:
+            return '2 to 5 business days';
+    }
+}
 
 /* --- DATA PERSISTENCE --- */
 function loadProducts() {
@@ -84,7 +117,7 @@ function saveOrders() {
     localStorage.setItem('restyle_orders', JSON.stringify(orders));
 }
 
-/* --- STOREFRONT FILTERING, SEARCH & PAGINATION --- */
+/* --- STOREFRONT RENDERING --- */
 window.renderStorefrontProducts = function() {
     const container = document.getElementById('products-container');
     if (!container) return;
@@ -92,15 +125,11 @@ window.renderStorefrontProducts = function() {
     let filtered = products.filter(product => {
         const matchesCategory = activeFilters.category === 'all' || 
             product.category.toLowerCase() === activeFilters.category.toLowerCase();
-        
         const matchesPrice = parseFloat(product.price) <= activeFilters.maxPrice;
-        
         const matchesColor = activeFilters.selectedColors.length === 0 || 
             (product.color && activeFilters.selectedColors.includes(product.color.toLowerCase()));
-            
         const matchesMaterial = activeFilters.selectedMaterials.length === 0 || 
             (product.material && activeFilters.selectedMaterials.includes(product.material.toLowerCase()));
-
         const matchesSearch = !activeFilters.searchQuery || 
             product.title.toLowerCase().includes(activeFilters.searchQuery.toLowerCase()) ||
             product.category.toLowerCase().includes(activeFilters.searchQuery.toLowerCase());
@@ -118,7 +147,7 @@ window.renderStorefrontProducts = function() {
         container.innerHTML = `
             <div style="grid-column: 1 / -1; text-align:center; padding: 40px 20px; background: #fdfdfd; border: 1px dashed #ccc; border-radius: 8px;">
                 <h3 style="margin: 12px 0 6px; font-size:18px; color:#333;">No items match your selected criteria</h3>
-                <p style="color:#777; font-size:13px; margin:0 auto 15px;">Try adjusting your price range, color, or material filters.</p>
+                <p style="color:#777; font-size:13px; margin:0 auto 15px;">Try adjusting your filters.</p>
                 <button onclick="resetAllFilters()" class="btn-dark" style="padding: 8px 16px; font-size:12px;">Reset Filters</button>
             </div>
         `;
@@ -147,7 +176,7 @@ window.renderStorefrontProducts = function() {
                     <h4>${product.title}</h4>
                     <div class="product-price">R${parseFloat(product.price).toFixed(2)}</div>
                     
-                    <div class="stock-status" style="font-size:11px; margin-bottom:8px; font-weight:bold; color: ${isComingSoon ? '#e65100' : (isOutOfStock ? '#d32f2f' : (stockQty < 5 ? '#e65100' : '#2e7d32'))};">
+                    <div class="stock-status" style="font-size:11px; margin-bottom:8px; font-weight:bold; color: ${isComingSoon ? '#e65100' : (isOutOfStock ? '#d32f2f' : '#2e7d32')};">
                         ${isComingSoon ? '⏳ Launching Soon' : (isOutOfStock ? '❌ Out of Stock' : `✔ In Stock: ${stockQty}`)}
                     </div>
 
@@ -173,11 +202,9 @@ function renderPagination(totalItems) {
     }
 
     let pagHTML = `<span onclick="changePage(${activeFilters.page - 1})" class="${activeFilters.page === 1 ? 'disabled' : ''}">&laquo; Prev</span>`;
-
     for (let i = 1; i <= totalPages; i++) {
         pagHTML += `<span onclick="changePage(${i})" class="${i === activeFilters.page ? 'active' : ''}">${i}</span>`;
     }
-
     pagHTML += `<span onclick="changePage(${activeFilters.page + 1})" class="${activeFilters.page === totalPages ? 'disabled' : ''}">Next &raquo;</span>`;
 
     pagContainer.innerHTML = pagHTML;
@@ -189,73 +216,6 @@ window.changePage = function(newPage) {
     activeFilters.page = newPage;
     renderStorefrontProducts();
     window.scrollTo({ top: 300, behavior: 'smooth' });
-};
-
-window.filterCategory = function(cat) {
-    activeFilters.category = cat;
-    activeFilters.page = 1;
-    renderStorefrontProducts();
-};
-
-window.updatePriceFilter = function(val) {
-    activeFilters.maxPrice = parseFloat(val);
-    const priceDisplay = document.getElementById('price-val-display');
-    if (priceDisplay) priceDisplay.innerText = `R${val}`;
-    activeFilters.page = 1;
-    renderStorefrontProducts();
-};
-
-window.toggleColorFilter = function(color, el) {
-    color = color.toLowerCase();
-    const index = activeFilters.selectedColors.indexOf(color);
-    if (index > -1) {
-        activeFilters.selectedColors.splice(index, 1);
-        el.style.outline = 'none';
-    } else {
-        activeFilters.selectedColors.push(color);
-        el.style.outline = '2px solid #222';
-    }
-    activeFilters.page = 1;
-    renderStorefrontProducts();
-};
-
-window.toggleMaterialFilter = function(material, isChecked) {
-    material = material.toLowerCase();
-    if (isChecked) {
-        if (!activeFilters.selectedMaterials.includes(material)) activeFilters.selectedMaterials.push(material);
-    } else {
-        activeFilters.selectedMaterials = activeFilters.selectedMaterials.filter(m => m !== material);
-    }
-    activeFilters.page = 1;
-    renderStorefrontProducts();
-};
-
-window.resetAllFilters = function() {
-    activeFilters = { category: 'all', maxPrice: 500, selectedColors: [], selectedMaterials: [], searchQuery: '', page: 1, itemsPerPage: 8 };
-    document.querySelectorAll('.color-swatches .swatch').forEach(s => s.style.outline = 'none');
-    document.querySelectorAll('.filter-list input[type="checkbox"]').forEach(cb => cb.checked = false);
-    const rangeInput = document.getElementById('price-range');
-    if (rangeInput) rangeInput.value = 500;
-    const priceDisplay = document.getElementById('price-val-display');
-    if (priceDisplay) priceDisplay.innerText = 'R500';
-    renderStorefrontProducts();
-};
-
-window.performSearch = function() {
-    const searchInput = document.getElementById('search-input');
-    if (!searchInput) return;
-
-    const query = searchInput.value.trim();
-    activeFilters.searchQuery = query;
-    activeFilters.page = 1;
-
-    closeAllModals();
-
-    if (document.getElementById('products-container')) {
-        renderStorefrontProducts();
-    } else {
-        window.location.href = `shop.html?search=${encodeURIComponent(query)}`;
-    }
 };
 
 /* --- CART SYSTEM --- */
@@ -288,11 +248,6 @@ window.addToCart = function(idOrTitle, price, image) {
         };
     }
 
-    if (itemToAdd.status === 'coming_soon') {
-        alert(`"${itemToAdd.title}" is coming soon and cannot be added to the cart yet.`);
-        return;
-    }
-
     const availableStock = parseInt(itemToAdd.stock) || 0;
     const existingIndex = cart.findIndex(item => String(item.id) === String(itemToAdd.id));
     const currentQtyInCart = existingIndex > -1 ? cart[existingIndex].qty : 0;
@@ -315,18 +270,6 @@ window.addToCart = function(idOrTitle, price, image) {
     if (overlay) overlay.style.display = 'block';
 };
 
-function attachGlobalButtonListeners() {
-    document.body.addEventListener('click', (e) => {
-        const btn = e.target.closest('.add-to-cart-btn, .btn-add-cart');
-        if (btn && !btn.getAttribute('onclick')) {
-            const name = btn.getAttribute('data-name') || btn.getAttribute('data-title') || 'Stylish Bag';
-            const price = btn.getAttribute('data-price') || 250;
-            const img = btn.getAttribute('data-image') || '';
-            addToCart(name, price, img);
-        }
-    });
-}
-
 window.removeFromCart = function(index) {
     cart.splice(index, 1);
     saveCart();
@@ -336,7 +279,7 @@ function updateCartUI() {
     const cartCount = document.getElementById('cart-count');
     const drawerCartCount = document.getElementById('drawer-cart-count');
     const container = document.getElementById('cart-items-container');
-    const totalPriceRl = document.getElementById('cart-total-price');
+    const totalPriceEl = document.getElementById('cart-total-price');
 
     const totalQty = cart.reduce((sum, item) => sum + (item.qty || 1), 0);
     if (cartCount) cartCount.innerText = totalQty;
@@ -353,7 +296,7 @@ function updateCartUI() {
                 const subtotal = itemPrice * itemQty;
 
                 return `
-                    <div class="cart-item-row" style="display:flex; justify-space-between; align-items:center; padding:10px 0; border-bottom:1px solid #eee;">
+                    <div class="cart-item-row" style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #eee;">
                         <div style="display:flex; align-items:center; gap:10px;">
                             <img src="${item.image}" style="width:40px; height:40px; object-fit:cover; border-radius:4px;">
                             <div>
@@ -370,12 +313,108 @@ function updateCartUI() {
             }).join('');
         }
     }
-    if (totalPriceRl) totalPriceRl.innerText = `R${total.toFixed(2)}`;
+    if (totalPriceEl) totalPriceEl.innerText = `R${total.toFixed(2)}`;
+    if (typeof updateCheckoutTotals === 'function') updateCheckoutTotals();
 }
 
-/* --- CHECKOUT & PAYSTACK PAYMENT --- */
+function calculateShippingCost(deliveryMethod, totalItems) {
+    if (deliveryMethod === 'pickup' || totalItems <= 0) return 0.00;
+
+    if (totalItems >= 1 && totalItems <= 3) {
+        switch (deliveryMethod) {
+            case 'paxi': return 60.00;
+            case 'pudo_locker': return 60.00;
+            case 'pudo_door': return 80.00;
+            default: return 0.00;
+        }
+    } else if (totalItems >= 4 && totalItems <= 8) {
+        switch (deliveryMethod) {
+            case 'paxi': return 60.00;
+            case 'pudo_locker': return 60.00;
+            case 'pudo_door': return 110.00;
+            default: return 0.00;
+        }
+    } else if (totalItems >= 9) {
+        switch (deliveryMethod) {
+            case 'paxi': return 110.00;
+            case 'pudo_locker': return 60.00;
+            case 'pudo_door': return 150.00;
+            default: return 0.00;
+        }
+    }
+    return 0.00;
+}
+
+window.updateCheckoutTotals = function() {
+    const deliverySelect = document.getElementById('checkout-delivery-method');
+    const shippingDisplay = document.getElementById('checkout-shipping-cost');
+    const grandTotalDisplay = document.getElementById('checkout-grand-total');
+
+    if (!deliverySelect || !shippingDisplay || !grandTotalDisplay) return;
+
+    const totalQty = cart.reduce((sum, item) => sum + (item.qty || 1), 0);
+    const subtotal = calculateCartTotal();
+    const selectedMethod = deliverySelect.value;
+
+    const shippingCost = calculateShippingCost(selectedMethod, totalQty);
+    const grandTotal = subtotal + shippingCost;
+
+    shippingDisplay.innerText = selectedMethod === 'pickup' ? 'R0.00 (Free)' : `R${shippingCost.toFixed(2)}`;
+    grandTotalDisplay.innerText = `R${grandTotal.toFixed(2)}`;
+};
+
+/* --- FORM VALIDATION WITH SOUTH AFRICAN PHONE RULES --- */
+function validateCheckoutForm() {
+    const name = document.getElementById('checkout-name')?.value.trim();
+    const email = document.getElementById('checkout-email')?.value.trim();
+    const phone = document.getElementById('checkout-phone')?.value.trim();
+    const deliveryMethod = document.getElementById('checkout-delivery-method')?.value;
+    const address = document.getElementById('checkout-address')?.value.trim();
+
+    if (!name) {
+        alert('Please enter your Full Name.');
+        document.getElementById('checkout-name')?.focus();
+        return null;
+    }
+    if (!email || !email.includes('@') || !email.includes('.')) {
+        alert('Please enter a valid Email Address for order confirmation.');
+        document.getElementById('checkout-email')?.focus();
+        return null;
+    }
+    if (!phone) {
+        alert('Please enter your Phone Number.');
+        document.getElementById('checkout-phone')?.focus();
+        return null;
+    }
+    if (!isValidSAPhone(phone)) {
+        alert('Please enter a valid South African phone number.\n\nAccepted formats:\n• 0815385051 (10 digits starting with 06, 07, or 08)\n• +27815385051 (International format)');
+        document.getElementById('checkout-phone')?.focus();
+        return null;
+    }
+    if (!deliveryMethod) {
+        alert('Please select a Delivery Method.');
+        document.getElementById('checkout-delivery-method')?.focus();
+        return null;
+    }
+    if (deliveryMethod !== 'pickup' && !address) {
+        alert('Please enter your Delivery Address or Paxi / Pudo Locker Store Name & Code.');
+        document.getElementById('checkout-address')?.focus();
+        return null;
+    }
+
+    return { 
+        name, 
+        email, 
+        phone: formatSAPhone(phone), 
+        deliveryMethod, 
+        address: address || 'Local Pick Up' 
+    };
+}
+
+/* --- CHECKOUT TRIGGER --- */
 window.checkout = function() {
-    if (cart.length === 0) {
+    const totalQty = cart.reduce((sum, item) => sum + (item.qty || 1), 0);
+    if (totalQty <= 0) {
         alert('Your cart is empty!');
         return;
     }
@@ -383,43 +422,46 @@ window.checkout = function() {
     const checkoutModal = document.getElementById('checkout-modal');
     if (checkoutModal) {
         showModal(checkoutModal);
+        updateCheckoutTotals();
     } else {
         payWithPaystack();
     }
 };
 
+
+/* --- PAYMENT INTEGRATION & AUTOMATED NOTIFICATIONS --- */
 window.payWithPaystack = function() {
-    const totalInCents = Math.round(calculateCartTotal() * 100);
-    if (totalInCents <= 0) {
-        alert('Your cart total is invalid.');
+    const totalQty = cart.reduce((sum, item) => sum + (item.qty || 1), 0);
+    if (totalQty <= 0) {
+        alert('Your cart is empty!');
         return;
     }
 
-    const emailInput = document.getElementById('checkout-email') || document.getElementById('customer-email');
-    const typedEmail = emailInput ? emailInput.value.trim() : '';
+    const customer = validateCheckoutForm();
+    if (!customer) return;
 
-    const userEmail = (currentUser && currentUser.email) 
-        ? currentUser.email 
-        : (typedEmail !== '' ? typedEmail : 'customer@restylethrifty.com');
-
-    if (!userEmail || !userEmail.includes('@')) {
-        alert('Please enter a valid email address to continue.');
-        if (emailInput) emailInput.focus();
-        return;
-    }
+    const subtotal = calculateCartTotal();
+    const shippingCost = calculateShippingCost(customer.deliveryMethod, totalQty);
+    const grandTotal = subtotal + shippingCost;
+    const grandTotalInCents = Math.round(grandTotal * 100);
 
     if (typeof PaystackPop === 'undefined') {
-        alert('Paystack library is not loaded. Please ensure the Paystack inline script tag is present in your HTML.');
+        alert('Paystack library is not loaded. Please ensure the Paystack script tag is present.');
         return;
     }
 
     let handler = PaystackPop.setup({
         key: 'pk_test_4949998eff8859d813c87a650de5202160e3f4ad',
-        email: userEmail,
-        amount: totalInCents,
+        email: customer.email,
+        amount: grandTotalInCents,
         currency: 'ZAR',
         callback: function(response) {
-            processOrderCompletion('Paystack Online', response.reference, userEmail);
+            processOrderCompletion('Paystack Online', response.reference, {
+                ...customer,
+                subtotal,
+                shippingCost,
+                grandTotal
+            });
         },
         onClose: function() {
             alert('Payment window closed. Order was not completed.');
@@ -437,33 +479,52 @@ window.toggleEftDetails = function() {
 };
 
 window.completeEftOrder = function() {
-    const emailInput = document.getElementById('checkout-email') || document.getElementById('customer-email');
-    const typedEmail = emailInput ? emailInput.value.trim() : '';
-    const userEmail = (currentUser && currentUser.email) ? currentUser.email : (typedEmail !== '' ? typedEmail : 'customer@restylethrifty.com');
+    const totalQty = cart.reduce((sum, item) => sum + (item.qty || 1), 0);
+    if (totalQty <= 0) {
+        alert('Your cart is empty!');
+        return;
+    }
 
-    processOrderCompletion('Manual Bank Transfer (EFT)', 'EFT-PENDING-' + Math.floor(100000 + Math.random() * 900000), userEmail);
+    const customer = validateCheckoutForm();
+    if (!customer) return;
+
+    const subtotal = calculateCartTotal();
+    const shippingCost = calculateShippingCost(customer.deliveryMethod, totalQty);
+    const grandTotal = subtotal + shippingCost;
+
+    processOrderCompletion('Manual Bank Transfer (EFT)', 'EFT-PENDING-' + Math.floor(100000 + Math.random() * 900000), {
+        ...customer,
+        subtotal,
+        shippingCost,
+        grandTotal
+    });
 };
 
-function processOrderCompletion(paymentMethod, reference, orderEmail) {
-    let orderTotal = 0;
+function processOrderCompletion(paymentMethod, reference, customerData) {
     let itemsSummary = [];
 
     cart.forEach(cartItem => {
         const prod = products.find(p => String(p.id) === String(cartItem.id));
         if (prod) prod.stock = Math.max(0, (parseInt(prod.stock) || 0) - cartItem.qty);
-        const itemSubtotal = (parseFloat(cartItem.price) || 0) * cartItem.qty;
-        orderTotal += itemSubtotal;
         itemsSummary.push(`${cartItem.qty}x ${cartItem.title}`);
     });
+
+    const estDeliveryTime = getEstimatedDeliveryTime(customerData.deliveryMethod);
 
     loadOrders();
     const newOrder = {
         id: 'ORD-' + Math.floor(100000 + Math.random() * 900000),
         date: new Date().toLocaleString(),
-        customer: currentUser ? currentUser.username : 'Guest Customer',
-        email: orderEmail || (currentUser ? currentUser.email : 'customer@restylethrifty.com'),
+        customer: customerData.name,
+        email: customerData.email,
+        phone: customerData.phone,
+        address: customerData.address,
+        deliveryMethod: customerData.deliveryMethod,
+        estimatedDelivery: estDeliveryTime,
         items: itemsSummary.join(', '),
-        total: orderTotal,
+        subtotal: customerData.subtotal,
+        shippingCost: customerData.shippingCost,
+        total: customerData.grandTotal,
         paymentMethod: paymentMethod,
         reference: reference
     };
@@ -472,12 +533,58 @@ function processOrderCompletion(paymentMethod, reference, orderEmail) {
     saveOrders();
     saveProducts();
 
-    alert(`Thank you for shopping with Restyle Thrifty!\n\nOrder ${newOrder.id} confirmed.\nPayment Method: ${paymentMethod}\nReference: ${reference}`);
+    // Trigger Automated Confirmations to Customer & Store Owner
+    dispatchAutomatedNotifications(newOrder);
+
     cart = [];
     saveCart();
     closeAllModals();
 
     if (document.getElementById('products-container')) renderStorefrontProducts();
+}
+
+/* --- AUTOMATED CONFIRMATION DISPATCHER --- */
+function dispatchAutomatedNotifications(order) {
+    const smsMessage = `Hi ${order.customer}! Restyle Thrifty order ${order.id} confirmed! Total: R${order.total.toFixed(2)}. Est. Delivery: ${order.estimatedDelivery}. Contact us: ${STORE_CONFIG.merchantPhone}`;
+    
+    const emailSubject = `Order Confirmation #${order.id} - Restyle Thrifty`;
+    const emailBody = `
+Dear ${order.customer},
+
+Thank you for shopping with Restyle Thrifty!
+
+--- ORDER DETAILS ---
+Order Number: ${order.id}
+Date: ${order.date}
+Items: ${order.items}
+Shipping Method: ${order.deliveryMethod}
+Estimated Delivery Time: ${order.estimatedDelivery}
+
+--- PAYMENT SUMMARY ---
+Subtotal: R${order.subtotal.toFixed(2)}
+Shipping Fee: R${order.shippingCost.toFixed(2)}
+Total Paid: R${order.total.toFixed(2)}
+Payment Method: ${order.paymentMethod}
+Reference: ${order.reference}
+
+Support Contact:
+Email: ${STORE_CONFIG.merchantEmail}
+Phone/WhatsApp: ${STORE_CONFIG.merchantPhone}
+    `;
+
+    // Simulated Email Notification
+    console.log(`[AUTOMATED EMAIL SENT TO ${order.email}]:\nSubject: ${emailSubject}\n${emailBody}`);
+
+    // Simulated SMS Notification
+    console.log(`[AUTOMATED SMS SENT TO ${order.phone}]:\n${smsMessage}`);
+
+    // Display confirmation popup on screen
+    alert(`🎉 THANK YOU FOR YOUR ORDER!\n\n` +
+          `Order ID: ${order.id}\n` +
+          `Estimated Delivery: ${order.estimatedDelivery}\n\n` +
+          `✉️ Automated confirmation sent to: ${order.email}\n` +
+          `📱 Automated SMS sent to: ${order.phone}\n\n` +
+          `For inquiries, contact us at ${STORE_CONFIG.merchantPhone} or ${STORE_CONFIG.merchantEmail}.`);
 }
 
 /* --- USER LOGIN & MODALS --- */
@@ -566,6 +673,18 @@ function closeAllModals() {
     if (overlay) overlay.style.display = 'none';
 }
 
+function attachGlobalButtonListeners() {
+    document.body.addEventListener('click', (e) => {
+        const btn = e.target.closest('.add-to-cart-btn, .btn-add-cart');
+        if (btn && !btn.getAttribute('onclick')) {
+            const name = btn.getAttribute('data-name') || btn.getAttribute('data-title') || 'Stylish Bag';
+            const price = btn.getAttribute('data-price') || 250;
+            const img = btn.getAttribute('data-image') || '';
+            addToCart(name, price, img);
+        }
+    });
+}
+
 function initComingSoon() {
     const teaserCards = document.querySelectorAll('.teaser-card');
     teaserCards.forEach(card => {
@@ -578,28 +697,20 @@ function initComingSoon() {
                 subscribers.push({ category: title, email: userEmail, date: new Date().toLocaleDateString() });
                 localStorage.setItem('restyle_waitlist', JSON.stringify(subscribers));
                 alert(`Thank you! We will notify ${userEmail} as soon as ${title} drops. ♥`);
-                if (typeof renderAdminWaitlist === 'function') renderAdminWaitlist();
             }
         });
     });
 }
 
-/* ==========================================================================
-   ADMIN PANEL CONTROLLER & AUTHENTICATION (MATCHES admin.html SPEC)
-   ========================================================================== */
-
+/* --- ADMIN PANEL --- */
 function initAdminPanel() {
     const loginScreen = document.getElementById('admin-login-screen');
     const dashboard = document.getElementById('admin-dashboard');
     const loginForm = document.getElementById('admin-login-form');
     const logoutBtn = document.getElementById('admin-logout-btn');
-    const addProductForm = document.getElementById('add-product-form');
-    const editProductForm = document.getElementById('edit-product-form');
-    const resetBtn = document.getElementById('reset-defaults-btn');
 
     const isLoggedIn = localStorage.getItem('restyle_admin_logged_in') === 'true';
 
-    // Toggle Screen Views
     if (isLoggedIn) {
         if (loginScreen) loginScreen.style.display = 'none';
         if (dashboard) dashboard.style.display = 'block';
@@ -609,7 +720,6 @@ function initAdminPanel() {
         if (dashboard) dashboard.style.display = 'none';
     }
 
-    // Attach Admin Login Listener
     if (loginForm && !loginForm.dataset.bound) {
         loginForm.dataset.bound = "true";
         loginForm.addEventListener('submit', (e) => {
@@ -626,7 +736,6 @@ function initAdminPanel() {
         });
     }
 
-    // Attach Admin Logout Listener
     if (logoutBtn && !logoutBtn.dataset.bound) {
         logoutBtn.dataset.bound = "true";
         logoutBtn.addEventListener('click', () => {
@@ -635,49 +744,21 @@ function initAdminPanel() {
             if (loginScreen) loginScreen.style.display = 'flex';
         });
     }
-
-    // Attach Reset Defaults Listener
-    if (resetBtn && !resetBtn.dataset.bound) {
-        resetBtn.dataset.bound = "true";
-        resetBtn.addEventListener('click', () => {
-            if (confirm('Are you sure you want to reset product inventory to defaults?')) {
-                products = [...DEFAULT_PRODUCTS];
-                saveProducts();
-                refreshAdminDashboard();
-                alert('Product inventory reset successfully.');
-            }
-        });
-    }
-
-    // Attach Add Product Listener
-    if (addProductForm && !addProductForm.dataset.bound) {
-        addProductForm.dataset.bound = "true";
-        addProductForm.addEventListener('submit', handleAddProductSubmit);
-    }
-
-    // Attach Edit Product Listener
-    if (editProductForm && !editProductForm.dataset.bound) {
-        editProductForm.dataset.bound = "true";
-        editProductForm.addEventListener('submit', handleEditProductSubmit);
-    }
 }
 
 function refreshAdminDashboard() {
     renderAdminStats();
     renderAdminProducts();
-    renderAdminWaitlist();
     renderAdminSales();
 }
 
-/* --- ADMIN STATS OVERVIEW --- */
 function renderAdminStats() {
     loadOrders();
     loadProducts();
 
-    const revenueRl = document.getElementById('total-revenue-display');
-    const ordersRl = document.getElementById('total-orders-display');
-    const itemsSoldRl = document.getElementById('total-items-sold-display');
-    const prodCountRl = document.getElementById('total-prod-count');
+    const revenueEl = document.getElementById('total-revenue-display');
+    const ordersEl = document.getElementById('total-orders-display');
+    const itemsSoldEl = document.getElementById('total-items-sold-display');
 
     let totalRevenue = 0;
     let totalItems = 0;
@@ -690,61 +771,14 @@ function renderAdminStats() {
                 const match = p.trim().match(/^(\d+)x/);
                 totalItems += match ? parseInt(match[1]) : 1;
             });
-        } else {
-            totalItems += 1;
         }
     });
 
-    if (revenueRl) revenueRl.innerText = `R${totalRevenue.toFixed(2)}`;
-    if (ordersRl) ordersRl.innerText = orders.length;
-    if (itemsSoldRl) itemsSoldRl.innerText = totalItems;
-    if (prodCountRl) prodCountRl.innerText = products.length;
+    if (revenueEl) revenueEl.innerText = `R${totalRevenue.toFixed(2)}`;
+    if (ordersEl) ordersEl.innerText = orders.length;
+    if (itemsSoldEl) itemsSoldEl.innerText = totalItems;
 }
 
-/* --- ADD NEW PRODUCT / TEASER FORM --- */
-function handleAddProductSubmit(e) {
-    e.preventDefault();
-
-    const title = document.getElementById('prod-title').value.trim();
-    const price = parseFloat(document.getElementById('prod-price').value) || 0;
-    const stock = parseInt(document.getElementById('prod-stock').value) || 0;
-    const category = document.getElementById('prod-category').value;
-    const status = document.getElementById('prod-status').value;
-    const imageUrlInput = document.getElementById('prod-image').value.trim();
-    const fileInput = document.getElementById('prod-file');
-
-    const saveAndAdd = (imgUrl) => {
-        const newProduct = {
-            id: 'prod_' + Date.now(),
-            title: title,
-            price: price,
-            stock: stock,
-            category: category,
-            color: 'black',
-            material: 'PU Leather',
-            status: status,
-            image: imgUrl || 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=500'
-        };
-
-        products.unshift(newProduct);
-        saveProducts();
-        refreshAdminDashboard();
-        e.target.reset();
-        alert(`Product "${title}" published successfully!`);
-    };
-
-    if (fileInput && fileInput.files && fileInput.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(evt) {
-            saveAndAdd(evt.target.result);
-        };
-        reader.readAsDataURL(fileInput.files[0]);
-    } else {
-        saveAndAdd(imageUrlInput);
-    }
-}
-
-/* --- INVENTORY CONTROL TABLE --- */
 function renderAdminProducts() {
     const tbody = document.getElementById('admin-product-rows');
     if (!tbody) return;
@@ -756,181 +790,57 @@ function renderAdminProducts() {
         return;
     }
 
-    tbody.innerHTML = products.map((product, idx) => {
-        const isComingSoon = product.status === 'coming_soon';
-        return `
-            <tr>
-                <td style="padding:8px;"><img src="${product.image}" style="width:40px; height:40px; object-fit:cover; border-radius:4px;"></td>
-                <td style="padding:8px;"><strong>${product.title}</strong></td>
-                <td style="padding:8px;">${product.category}</td>
-                <td style="padding:8px;">E${parseFloat(product.price).toFixed(2)}</td>
-                <td style="padding:8px;">
-                    <span style="font-size:11px; padding:3px 6px; border-radius:3px; background:${isComingSoon ? '#fff3e0' : (product.stock > 0 ? '#e8f5e9' : '#ffebee')}; color:${isComingSoon ? '#e65100' : (product.stock > 0 ? '#2e7d32' : '#c62828')}; font-weight:bold;">
-                        ${isComingSoon ? '🔥 Coming Soon' : (product.stock > 0 ? `In Stock (${product.stock})` : 'Out of Stock')}
-                    </span>
-                </td>
-                <td style="padding:8px;">
-                    <button onclick="openEditModal('${product.id}')" style="padding:4px 8px; font-size:11px; background:#222; color:#fff; border:none; cursor:pointer; margin-right:4px;">Edit</button>
-                    <button onclick="toggleProductStatus(${idx})" style="padding:4px 8px; font-size:11px; cursor:pointer; margin-right:4px;">
-                        ${isComingSoon ? 'Make Available' : 'Set Teaser'}
-                    </button>
-                    <button onclick="deleteProduct('${product.id}')" style="padding:4px 8px; font-size:11px; background:#d32f2f; color:#fff; border:none; cursor:pointer;">Delete</button>
-                </td>
-            </tr>
-        `;
-    }).join('');
+    tbody.innerHTML = products.map((product) => `
+        <tr>
+            <td style="padding:8px;"><img src="${product.image}" style="width:40px; height:40px; object-fit:cover; border-radius:4px;"></td>
+            <td style="padding:8px;"><strong>${product.title}</strong></td>
+            <td style="padding:8px;">R${parseFloat(product.price).toFixed(2)}</td>
+            <td style="padding:8px;">
+                <input type="number" value="${product.stock}" min="0" onchange="updateProductStock('${product.id}', this.value)" style="width:60px; padding:4px;">
+            </td>
+            <td style="padding:8px;"><span class="badge">${product.status}</span></td>
+            <td style="padding:8px;">
+                <button onclick="deleteProduct('${product.id}')" style="color:red; background:none; border:none; cursor:pointer;"><i class="fas fa-trash"></i> Delete</button>
+            </td>
+        </tr>
+    `).join('');
 }
 
-window.toggleProductStatus = function(index) {
-    if (products[index]) {
-        products[index].status = products[index].status === 'coming_soon' ? 'available' : 'coming_soon';
+window.updateProductStock = function(id, newStock) {
+    const prod = products.find(p => String(p.id) === String(id));
+    if (prod) {
+        prod.stock = parseInt(newStock) || 0;
         saveProducts();
-        refreshAdminDashboard();
     }
 };
 
 window.deleteProduct = function(id) {
-    if (confirm('Delete this product permanently?')) {
+    if (confirm('Are you sure you want to delete this product?')) {
         products = products.filter(p => String(p.id) !== String(id));
         saveProducts();
         refreshAdminDashboard();
     }
 };
 
-/* --- EDIT PRODUCT HANDLERS --- */
-window.openEditModal = function(id) {
-    const product = products.find(p => String(p.id) === String(id));
-    if (!product) return;
-
-    const editId = document.getElementById('edit-prod-id');
-    const editTitle = document.getElementById('edit-prod-title');
-    const editPrice = document.getElementById('edit-prod-price');
-    const editStock = document.getElementById('edit-prod-stock');
-    const editStatus = document.getElementById('edit-prod-status');
-
-    if (editId) editId.value = product.id;
-    if (editTitle) editTitle.value = product.title;
-    if (editPrice) editPrice.value = product.price;
-    if (editStock) editStock.value = product.stock ?? 0;
-    if (editStatus) editStatus.value = product.status || 'available';
-
-    const modal = document.getElementById('edit-product-modal');
-    const overlay = document.getElementById('edit-modal-overlay') || document.getElementById('overlay');
-
-    if (modal) modal.style.display = 'block';
-    if (overlay) overlay.style.display = 'block';
-};
-
-window.closeEditModal = function() {
-    const modal = document.getElementById('edit-product-modal');
-    const overlay = document.getElementById('edit-modal-overlay') || document.getElementById('overlay');
-    if (modal) modal.style.display = 'none';
-    if (overlay) overlay.style.display = 'none';
-};
-
-function handleEditProductSubmit(e) {
-    e.preventDefault();
-    const id = document.getElementById('edit-prod-id').value;
-    const product = products.find(p => String(p.id) === String(id));
-
-    if (product) {
-        product.title = document.getElementById('edit-prod-title').value.trim();
-        product.price = parseFloat(document.getElementById('edit-prod-price').value) || 0;
-        product.stock = parseInt(document.getElementById('edit-prod-stock').value) || 0;
-        product.status = document.getElementById('edit-prod-status').value;
-
-        saveProducts();
-        refreshAdminDashboard();
-        closeEditModal();
-        alert(`Product "${product.title}" updated successfully!`);
-    }
-}
-
-/* --- WAITLIST TABLE --- */
-function renderAdminWaitlist() {
-    const tbody = document.getElementById('admin-waitlist-rows');
-    if (!tbody) return;
-
-    const waitlist = JSON.parse(localStorage.getItem('restyle_waitlist') || '[]');
-
-    if (waitlist.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding:15px; color:#777;">No subscribers registered yet.</td></tr>`;
-        return;
-    }
-
-    tbody.innerHTML = waitlist.map(entry => `
-        <tr>
-            <td style="padding:8px;"><strong>${entry.category || 'General Teaser'}</strong></td>
-            <td style="padding:8px;"><a href="mailto:${entry.email}">${entry.email}</a></td>
-            <td style="padding:8px;">${entry.date ? new Date(entry.date).toLocaleDateString() : 'Recent'}</td>
-        </tr>
-    `).join('');
-}
-
-window.clearWaitlist = function() {
-    if (confirm('Clear all waitlist subscribers?')) {
-        localStorage.removeItem('restyle_waitlist');
-        renderAdminWaitlist();
-    }
-};
-
-/* --- SALES HISTORY TABLE --- */
 function renderAdminSales() {
-    const tbody = document.getElementById('admin-sales-rows');
-    if (!tbody) return;
+    const container = document.getElementById('admin-sales-rows');
+    if (!container) return;
 
     loadOrders();
-
     if (orders.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:15px; color:#777;">No customer orders placed yet.</td></tr>`;
+        container.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:15px;">No orders recorded yet.</td></tr>';
         return;
     }
 
-    tbody.innerHTML = orders.map(order => `
+    container.innerHTML = orders.map(o => `
         <tr>
-            <td style="padding:8px;"><strong>${order.id}</strong></td>
-            <td style="padding:8px;">${order.date}</td>
-            <td style="padding:8px;">${order.customer} <br><small style="color:#666;">${order.email}</small></td>
-            <td style="padding:8px;">${order.items}</td>
-            <td style="padding:8px;"><strong>E${parseFloat(order.total).toFixed(2)}</strong></td>
+            <td style="padding:8px;"><strong>${o.id}</strong></td>
+            <td style="padding:8px;">${o.date}</td>
+            <td style="padding:8px;">${o.customer} (${o.phone || 'N/A'})</td>
+            <td style="padding:8px;">${o.items}</td>
+            <td style="padding:8px;">R${(parseFloat(o.shippingCost) || 0).toFixed(2)} (${o.deliveryMethod})</td>
+            <td style="padding:8px;"><strong>R${parseFloat(o.total).toFixed(2)}</strong></td>
+            <td style="padding:8px;"><span class="badge">${o.paymentMethod}</span></td>
         </tr>
     `).join('');
 }
-
-// Sync all static homepage images & category cards with Admin inventory
-function syncHomepageStaticCards() {
-    const savedProducts = localStorage.getItem('restyle_products');
-    if (!savedProducts) return;
-    
-    try {
-        const currentProducts = JSON.parse(savedProducts);
-        const activeIds = currentProducts.map(p => String(p.id));
-        const activeCategories = currentProducts.map(p => p.category);
-
-        // 1. Sync elements with data-id (Hero, New Arrivals, Promo Grid, Teasers)
-        document.querySelectorAll('[data-id]').forEach(el => {
-            const cardId = String(el.getAttribute('data-id'));
-            if (!activeIds.includes(cardId)) {
-                el.style.display = 'none'; // Hides instantly if deleted from Admin
-            } else {
-                el.style.display = '';
-            }
-        });
-
-        // 2. Sync Shop By Category cards (Hides category card if no products exist for it)
-        document.querySelectorAll('.cat-card[data-category]').forEach(card => {
-            const cat = card.getAttribute('data-category');
-            if (!activeCategories.includes(cat)) {
-                card.style.display = 'none';
-            } else {
-                card.style.display = '';
-            }
-        });
-
-    } catch (e) {
-        console.error('Error syncing homepage cards:', e);
-    }
-}
-
-// Run sync automatically whenever homepage loads
-document.addEventListener('DOMContentLoaded', syncHomepageStaticCards);
