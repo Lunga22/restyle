@@ -1,8 +1,7 @@
 /* ==========================================================================
-   RESTYLE THRIFTY - COMPLETE CORE SCRIPT WITH SA VALIDATION & ADMIN SUITE
+   RESTYLE THRIFTY - CORE ENGINE & SA E-COMMERCE INTEGRATION
    ========================================================================== */
 
-// Store Merchant Details
 const STORE_CONFIG = {
     merchantPhone: '+27815385051',
     merchantEmail: 'gugunyawose6@gmail.com',
@@ -59,16 +58,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-/* --- PHONE VALIDATION & ESTIMATED DELIVERY LOGIC --- */
+/* --- SOUTH AFRICAN PHONE VALIDATION & ESTIMATED DELIVERY --- */
 
-// Validates standard SA formats: 0815385051, +27815385051, 0721234567, etc.
 function isValidSAPhone(phone) {
+    if (!phone) return false;
     const cleanPhone = phone.replace(/[\s\-\(\)]/g, '');
     const saRegex = /^(\+27|0)[678]\d{8}$/;
     return saRegex.test(cleanPhone);
 }
 
-// Format phone to standard international format (+27...)
 function formatSAPhone(phone) {
     let clean = phone.replace(/[\s\-\(\)]/g, '');
     if (clean.startsWith('0')) {
@@ -77,23 +75,18 @@ function formatSAPhone(phone) {
     return clean;
 }
 
-// Get delivery timeframes depending on method
 function getEstimatedDeliveryTime(deliveryMethod) {
     switch (deliveryMethod) {
-        case 'paxi':
-            return '7 to 9 business days (Paxi Store-to-Store)';
-        case 'pudo_locker':
-            return '1 to 4 business days (Pudo Locker-to-Locker)';
-        case 'pudo_door':
-            return '1 to 3 business days (Pudo Door Courier)';
-        case 'pickup':
-            return '1 to 2 business days (Ready for Local Pick Up)';
-        default:
-            return '2 to 5 business days';
+        case 'paxi': return '7 to 9 business days (Paxi Store-to-Store)';
+        case 'pudo_locker': return '1 to 4 business days (Pudo Locker-to-Locker)';
+        case 'pudo_door': return '1 to 3 business days (Pudo Door Courier)';
+        case 'pickup': return '1 to 2 business days (Ready for Local Pick Up)';
+        default: return '2 to 5 business days';
     }
 }
 
 /* --- DATA PERSISTENCE --- */
+
 function loadProducts() {
     const saved = localStorage.getItem('restyle_products');
     if (saved) {
@@ -117,12 +110,10 @@ function saveOrders() {
     localStorage.setItem('restyle_orders', JSON.stringify(orders));
 }
 
-/* --- STOREFRONT RENDERING --- */
-window.renderStorefrontProducts = function() {
-    const container = document.getElementById('products-container');
-    if (!container) return;
+/* --- FILTER ENGINE & STOREFRONT RENDERING --- */
 
-    let filtered = products.filter(product => {
+function getFilteredProducts() {
+    return products.filter(product => {
         const matchesCategory = activeFilters.category === 'all' || 
             product.category.toLowerCase() === activeFilters.category.toLowerCase();
         const matchesPrice = parseFloat(product.price) <= activeFilters.maxPrice;
@@ -136,9 +127,16 @@ window.renderStorefrontProducts = function() {
 
         return matchesCategory && matchesPrice && matchesColor && matchesMaterial && matchesSearch;
     });
+}
 
+window.renderStorefrontProducts = function() {
+    const container = document.getElementById('products-container');
+    if (!container) return;
+
+    const filtered = getFilteredProducts();
     const totalResults = filtered.length;
     const countDisplay = document.getElementById('showing-count');
+
     if (countDisplay) {
         countDisplay.innerText = `SHOWING ${totalResults > 0 ? (activeFilters.page - 1) * activeFilters.itemsPerPage + 1 : 0} – ${Math.min(activeFilters.page * activeFilters.itemsPerPage, totalResults)} OF ${totalResults} PRODUCTS`;
     }
@@ -191,6 +189,16 @@ window.renderStorefrontProducts = function() {
     renderPagination(totalResults);
 };
 
+window.resetAllFilters = function() {
+    activeFilters.category = 'all';
+    activeFilters.maxPrice = 500;
+    activeFilters.selectedColors = [];
+    activeFilters.selectedMaterials = [];
+    activeFilters.searchQuery = '';
+    activeFilters.page = 1;
+    renderStorefrontProducts();
+};
+
 function renderPagination(totalItems) {
     const pagContainer = document.getElementById('pagination-container');
     if (!pagContainer) return;
@@ -211,14 +219,17 @@ function renderPagination(totalItems) {
 }
 
 window.changePage = function(newPage) {
-    const totalPages = Math.ceil(products.length / activeFilters.itemsPerPage);
+    const filteredCount = getFilteredProducts().length;
+    const totalPages = Math.ceil(filteredCount / activeFilters.itemsPerPage);
+
     if (newPage < 1 || newPage > totalPages) return;
     activeFilters.page = newPage;
     renderStorefrontProducts();
     window.scrollTo({ top: 300, behavior: 'smooth' });
 };
 
-/* --- CART SYSTEM --- */
+/* --- SHOPPING CART MANAGEMENT --- */
+
 function initCart() {
     const savedCart = localStorage.getItem('restyle_cart');
     if (savedCart) { try { cart = JSON.parse(savedCart); } catch (e) { cart = []; } }
@@ -235,7 +246,7 @@ function calculateCartTotal() {
 }
 
 window.addToCart = function(idOrTitle, price, image) {
-    let itemToAdd = products.find(p => String(p.id) === String(idOrTitle));
+    let itemToAdd = products.find(p => String(p.id) === String(idOrTitle) || p.title.toLowerCase() === String(idOrTitle).toLowerCase());
 
     if (!itemToAdd) {
         itemToAdd = {
@@ -363,44 +374,31 @@ window.updateCheckoutTotals = function() {
     grandTotalDisplay.innerText = `R${grandTotal.toFixed(2)}`;
 };
 
-/* --- FORM VALIDATION WITH SOUTH AFRICAN PHONE RULES --- */
-function validateCheckoutForm() {
-    const name = document.getElementById('checkout-name')?.value.trim();
-    const email = document.getElementById('checkout-email')?.value.trim();
-    const phone = document.getElementById('checkout-phone')?.value.trim();
-    const deliveryMethod = document.getElementById('checkout-delivery-method')?.value;
-    const address = document.getElementById('checkout-address')?.value.trim();
+/* --- FORM VALIDATION & CHECKOUT --- */
 
-    if (!name) {
-        alert('Please enter your Full Name.');
-        document.getElementById('checkout-name')?.focus();
-        return null;
-    }
-    if (!email || !email.includes('@') || !email.includes('.')) {
-        alert('Please enter a valid Email Address for order confirmation.');
-        document.getElementById('checkout-email')?.focus();
-        return null;
-    }
-    if (!phone) {
-        alert('Please enter your Phone Number.');
-        document.getElementById('checkout-phone')?.focus();
-        return null;
-    }
+function validateCheckoutForm() {
+    const nameEl = document.getElementById('checkout-name');
+    const emailEl = document.getElementById('checkout-email');
+    const phoneEl = document.getElementById('checkout-phone');
+    const deliveryMethodEl = document.getElementById('checkout-delivery-method');
+    const addressEl = document.getElementById('checkout-address');
+
+    const name = nameEl ? nameEl.value.trim() : '';
+    const email = emailEl ? emailEl.value.trim() : '';
+    const phone = phoneEl ? phoneEl.value.trim() : '';
+    const deliveryMethod = deliveryMethodEl ? deliveryMethodEl.value : '';
+    const address = addressEl ? addressEl.value.trim() : '';
+
+    if (!name) { alert('Please enter your Full Name.'); if(nameEl) nameEl.focus(); return null; }
+    if (!email || !email.includes('@') || !email.includes('.')) { alert('Please enter a valid Email Address.'); if(emailEl) emailEl.focus(); return null; }
+    if (!phone) { alert('Please enter your Phone Number.'); if(phoneEl) phoneEl.focus(); return null; }
     if (!isValidSAPhone(phone)) {
-        alert('Please enter a valid South African phone number.\n\nAccepted formats:\n• 0815385051 (10 digits starting with 06, 07, or 08)\n• +27815385051 (International format)');
-        document.getElementById('checkout-phone')?.focus();
+        alert('Please enter a valid South African phone number.\n\nAccepted formats:\n• 0815385051\n• +27815385051');
+        if(phoneEl) phoneEl.focus();
         return null;
     }
-    if (!deliveryMethod) {
-        alert('Please select a Delivery Method.');
-        document.getElementById('checkout-delivery-method')?.focus();
-        return null;
-    }
-    if (deliveryMethod !== 'pickup' && !address) {
-        alert('Please enter your Delivery Address or Paxi / Pudo Locker Store Name & Code.');
-        document.getElementById('checkout-address')?.focus();
-        return null;
-    }
+    if (!deliveryMethod) { alert('Please select a Delivery Method.'); if(deliveryMethodEl) deliveryMethodEl.focus(); return null; }
+    if (deliveryMethod !== 'pickup' && !address) { alert('Please enter your Delivery Address or Paxi / Pudo Locker Store Name & Code.'); if(addressEl) addressEl.focus(); return null; }
 
     return { 
         name, 
@@ -411,24 +409,6 @@ function validateCheckoutForm() {
     };
 }
 
-/* --- CHECKOUT TRIGGER --- */
-window.checkout = function() {
-    const totalQty = cart.reduce((sum, item) => sum + (item.qty || 1), 0);
-    if (totalQty <= 0) {
-        alert('Your cart is empty!');
-        return;
-    }
-
-    const checkoutModal = document.getElementById('checkout-modal');
-    if (checkoutModal) {
-        showModal(checkoutModal);
-        updateCheckoutTotals();
-    } else {
-        payWithPaystack();
-    }
-};
-
-/* --- PAYMENT INTEGRATION & AUTOMATED NOTIFICATIONS --- */
 window.payWithPaystack = function() {
     const totalQty = cart.reduce((sum, item) => sum + (item.qty || 1), 0);
     if (totalQty <= 0) {
@@ -445,7 +425,7 @@ window.payWithPaystack = function() {
     const grandTotalInCents = Math.round(grandTotal * 100);
 
     if (typeof PaystackPop === 'undefined') {
-        alert('Paystack library is not loaded. Please ensure the Paystack script tag is present.');
+        alert('Paystack library is loading or missing. Please try again in a few seconds.');
         return;
     }
 
@@ -468,35 +448,6 @@ window.payWithPaystack = function() {
     });
 
     handler.openIframe();
-};
-
-window.toggleEftDetails = function() {
-    const eftBox = document.getElementById('eft-details');
-    if (eftBox) {
-        eftBox.style.display = (eftBox.style.display === 'none' || eftBox.style.display === '') ? 'block' : 'none';
-    }
-};
-
-window.completeEftOrder = function() {
-    const totalQty = cart.reduce((sum, item) => sum + (item.qty || 1), 0);
-    if (totalQty <= 0) {
-        alert('Your cart is empty!');
-        return;
-    }
-
-    const customer = validateCheckoutForm();
-    if (!customer) return;
-
-    const subtotal = calculateCartTotal();
-    const shippingCost = calculateShippingCost(customer.deliveryMethod, totalQty);
-    const grandTotal = subtotal + shippingCost;
-
-    processOrderCompletion('Manual Bank Transfer (EFT)', 'EFT-PENDING-' + Math.floor(100000 + Math.random() * 900000), {
-        ...customer,
-        subtotal,
-        shippingCost,
-        grandTotal
-    });
 };
 
 function processOrderCompletion(paymentMethod, reference, customerData) {
@@ -532,7 +483,6 @@ function processOrderCompletion(paymentMethod, reference, customerData) {
     saveOrders();
     saveProducts();
 
-    // Trigger Automated Confirmations
     dispatchAutomatedNotifications(newOrder);
 
     cart = [];
@@ -542,47 +492,17 @@ function processOrderCompletion(paymentMethod, reference, customerData) {
     if (document.getElementById('products-container')) renderStorefrontProducts();
 }
 
-/* --- AUTOMATED CONFIRMATION DISPATCHER --- */
 function dispatchAutomatedNotifications(order) {
-    const smsMessage = `Hi ${order.customer}! Restyle Thrifty order ${order.id} confirmed! Total: R${order.total.toFixed(2)}. Est. Delivery: ${order.estimatedDelivery}. Contact us: ${STORE_CONFIG.merchantPhone}`;
-    
-    const emailSubject = `Order Confirmation #${order.id} - Restyle Thrifty`;
-    const emailBody = `
-Dear ${order.customer},
-
-Thank you for shopping with Restyle Thrifty!
-
---- ORDER DETAILS ---
-Order Number: ${order.id}
-Date: ${order.date}
-Items: ${order.items}
-Shipping Method: ${order.deliveryMethod}
-Estimated Delivery Time: ${order.estimatedDelivery}
-
---- PAYMENT SUMMARY ---
-Subtotal: R${order.subtotal.toFixed(2)}
-Shipping Fee: R${order.shippingCost.toFixed(2)}
-Total Paid: R${order.total.toFixed(2)}
-Payment Method: ${order.paymentMethod}
-Reference: ${order.reference}
-
-Support Contact:
-Email: ${STORE_CONFIG.merchantEmail}
-Phone/WhatsApp: ${STORE_CONFIG.merchantPhone}
-    `;
-
-    console.log(`[AUTOMATED EMAIL SENT TO ${order.email}]:\nSubject: ${emailSubject}\n${emailBody}`);
-    console.log(`[AUTOMATED SMS SENT TO ${order.phone}]:\n${smsMessage}`);
-
     alert(`🎉 THANK YOU FOR YOUR ORDER!\n\n` +
           `Order ID: ${order.id}\n` +
           `Estimated Delivery: ${order.estimatedDelivery}\n\n` +
           `✉️ Automated confirmation sent to: ${order.email}\n` +
           `📱 Automated SMS sent to: ${order.phone}\n\n` +
-          `For inquiries, contact us at ${STORE_CONFIG.merchantPhone} or ${STORE_CONFIG.merchantEmail}.`);
+          `For inquiries, contact us at ${STORE_CONFIG.merchantPhone}.`);
 }
 
-/* --- USER LOGIN & MODALS --- */
+/* --- USER & MODALS HANDLERS --- */
+
 function initLogin() {
     const loginForm = document.getElementById('customer-login-form');
     if (loginForm) {
@@ -697,7 +617,8 @@ function initComingSoon() {
     });
 }
 
-/* --- ADMIN PANEL SYSTEM --- */
+/* --- ADMIN PANEL ENGINE --- */
+
 function initAdminPanel() {
     const loginScreen = document.getElementById('admin-login-screen');
     const dashboard = document.getElementById('admin-dashboard');
@@ -726,72 +647,20 @@ function initAdminPanel() {
                 if (dashboard) dashboard.style.display = 'block';
                 refreshAdminDashboard();
             } else {
-                alert('Invalid Password. Try using: admin123');
+                alert('Invalid Password.');
             }
         });
     }
 
     if (logoutBtn && !logoutBtn.dataset.bound) {
         logoutBtn.dataset.bound = "true";
-        logoutBtn.addEventListener('click', logoutAdmin);
-    }
-
-    // Bind Edit Product Form if present
-    const editForm = document.getElementById('edit-product-form');
-    if (editForm && !editForm.dataset.bound) {
-        editForm.dataset.bound = "true";
-        editForm.addEventListener('submit', window.saveProductEdit);
-    }
-
-    // Bind Add Product Form if present
-    const addForm = document.getElementById('add-product-form');
-    if (addForm && !addForm.dataset.bound) {
-        addForm.dataset.bound = "true";
-        addForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const title = document.getElementById('add-product-title')?.value.trim();
-            const price = parseFloat(document.getElementById('add-product-price')?.value) || 0;
-            const stock = parseInt(document.getElementById('add-product-stock')?.value) || 0;
-            const category = document.getElementById('add-product-category')?.value || 'Handbags';
-            const image = document.getElementById('add-product-image')?.value.trim() || 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=500';
-            const color = document.getElementById('add-product-color')?.value || 'black';
-            const material = document.getElementById('add-product-material')?.value || 'Leather';
-            const status = document.getElementById('add-product-status')?.value || 'available';
-
-            if (!title || price <= 0) {
-                alert('Please enter a valid product title and price.');
-                return;
-            }
-
-            const newProduct = {
-                id: String(Date.now()),
-                title,
-                price,
-                stock,
-                category,
-                color,
-                material,
-                status,
-                image
-            };
-
-            products.unshift(newProduct);
-            saveProducts();
-            addForm.reset();
-            refreshAdminDashboard();
-            if (document.getElementById('products-container')) renderStorefrontProducts();
-            alert('Product added successfully!');
+        logoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('restyle_admin_logged_in');
+            if (dashboard) dashboard.style.display = 'none';
+            if (loginScreen) loginScreen.style.display = 'flex';
         });
     }
 }
-
-window.logoutAdmin = function() {
-    localStorage.removeItem('restyle_admin_logged_in');
-    const dashboard = document.getElementById('admin-dashboard');
-    const loginScreen = document.getElementById('admin-login-screen');
-    if (dashboard) dashboard.style.display = 'none';
-    if (loginScreen) loginScreen.style.display = 'flex';
-};
 
 function refreshAdminDashboard() {
     renderAdminStats();
@@ -847,75 +716,11 @@ function renderAdminProducts() {
             </td>
             <td style="padding:8px;"><span class="badge">${product.status}</span></td>
             <td style="padding:8px;">
-                <button onclick="editProduct('${product.id}')" style="color:#9e6038; background:none; border:none; cursor:pointer; margin-right:8px;"><i class="fas fa-edit"></i> Edit</button>
                 <button onclick="deleteProduct('${product.id}')" style="color:red; background:none; border:none; cursor:pointer;"><i class="fas fa-trash"></i> Delete</button>
             </td>
         </tr>
     `).join('');
 }
-
-/* --- EDIT PRODUCT MODAL HANDLERS --- */
-window.editProduct = function(productId) {
-    loadProducts();
-    const product = products.find(p => String(p.id) === String(productId));
-    if (!product) return;
-
-    const editId = document.getElementById('edit-product-id');
-    const editName = document.getElementById('edit-product-name');
-    const editPrice = document.getElementById('edit-product-price');
-    const editCategory = document.getElementById('edit-product-category');
-    const editStock = document.getElementById('edit-product-stock');
-    const editImg = document.getElementById('edit-product-img');
-    const editStatus = document.getElementById('edit-product-status');
-
-    if (editId) editId.value = product.id;
-    if (editName) editName.value = product.title || product.name || '';
-    if (editPrice) editPrice.value = product.price;
-    if (editCategory) editCategory.value = product.category || 'Handbags';
-    if (editStock) editStock.value = product.stock || 0;
-    if (editImg) editImg.value = product.image || '';
-    if (editStatus) editStatus.value = product.status || 'available';
-
-    const modal = document.getElementById('edit-product-modal');
-    if (modal) showModal(modal);
-};
-
-window.closeEditModal = function() {
-    const modal = document.getElementById('edit-product-modal');
-    if (modal) modal.style.display = 'none';
-    const overlay = document.getElementById('overlay');
-    if (overlay) overlay.style.display = 'none';
-};
-
-window.saveProductEdit = function(e) {
-    if (e) e.preventDefault();
-    const idInput = document.getElementById('edit-product-id');
-    if (!idInput) return;
-
-    const id = String(idInput.value);
-    loadProducts();
-
-    products = products.map(p => {
-        if (String(p.id) === id) {
-            return {
-                ...p,
-                title: document.getElementById('edit-product-name')?.value || p.title,
-                price: parseFloat(document.getElementById('edit-product-price')?.value) || p.price,
-                category: document.getElementById('edit-product-category')?.value || p.category,
-                stock: parseInt(document.getElementById('edit-product-stock')?.value) || p.stock,
-                image: document.getElementById('edit-product-img')?.value || p.image,
-                status: document.getElementById('edit-product-status')?.value || p.status || 'available'
-            };
-        }
-        return p;
-    });
-
-    saveProducts();
-    closeEditModal();
-    refreshAdminDashboard();
-    if (document.getElementById('products-container')) renderStorefrontProducts();
-    alert('Product updated successfully!');
-};
 
 window.updateProductStock = function(id, newStock) {
     const prod = products.find(p => String(p.id) === String(id));
@@ -930,7 +735,6 @@ window.deleteProduct = function(id) {
         products = products.filter(p => String(p.id) !== String(id));
         saveProducts();
         refreshAdminDashboard();
-        if (document.getElementById('products-container')) renderStorefrontProducts();
     }
 };
 
