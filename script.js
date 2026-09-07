@@ -594,6 +594,7 @@ function initAdminPanel() {
     const loginForm = document.getElementById('admin-login-form');
     const logoutBtn = document.getElementById('admin-logout-btn');
     const addProductForm = document.getElementById('add-product-form');
+    const editProductForm = document.getElementById('edit-product-form');
     const resetBtn = document.getElementById('reset-defaults-btn');
 
     const isLoggedIn = localStorage.getItem('restyle_admin_logged_in') === 'true';
@@ -653,6 +654,12 @@ function initAdminPanel() {
         addProductForm.dataset.bound = "true";
         addProductForm.addEventListener('submit', handleAddProductSubmit);
     }
+
+    // Attach Edit Product Listener
+    if (editProductForm && !editProductForm.dataset.bound) {
+        editProductForm.dataset.bound = "true";
+        editProductForm.addEventListener('submit', handleEditProductSubmit);
+    }
 }
 
 function refreshAdminDashboard() {
@@ -667,10 +674,10 @@ function renderAdminStats() {
     loadOrders();
     loadProducts();
 
-    const revenueEl = document.getElementById('total-revenue-display');
-    const ordersEl = document.getElementById('total-orders-display');
-    const itemsSoldEl = document.getElementById('total-items-sold-display');
-    const prodCountEl = document.getElementById('total-prod-count');
+    const revenueRl = document.getElementById('total-revenue-display');
+    const ordersRl = document.getElementById('total-orders-display');
+    const itemsSoldRl = document.getElementById('total-items-sold-display');
+    const prodCountRl = document.getElementById('total-prod-count');
 
     let totalRevenue = 0;
     let totalItems = 0;
@@ -688,10 +695,10 @@ function renderAdminStats() {
         }
     });
 
-    if (revenueEl) revenueEl.innerText = `R${totalRevenue.toFixed(2)}`;
-    if (ordersEl) ordersEl.innerText = orders.length;
-    if (itemsSoldEl) itemsSoldEl.innerText = totalItems;
-    if (prodCountEl) prodCountEl.innerText = products.length;
+    if (revenueRl) revenueRl.innerText = `R${totalRevenue.toFixed(2)}`;
+    if (ordersRl) ordersRl.innerText = orders.length;
+    if (itemsSoldRl) itemsSoldRl.innerText = totalItems;
+    if (prodCountRl) prodCountRl.innerText = products.length;
 }
 
 /* --- ADD NEW PRODUCT / TEASER FORM --- */
@@ -756,13 +763,14 @@ function renderAdminProducts() {
                 <td style="padding:8px;"><img src="${product.image}" style="width:40px; height:40px; object-fit:cover; border-radius:4px;"></td>
                 <td style="padding:8px;"><strong>${product.title}</strong></td>
                 <td style="padding:8px;">${product.category}</td>
-                <td style="padding:8px;">R${parseFloat(product.price).toFixed(2)}</td>
+                <td style="padding:8px;">E${parseFloat(product.price).toFixed(2)}</td>
                 <td style="padding:8px;">
                     <span style="font-size:11px; padding:3px 6px; border-radius:3px; background:${isComingSoon ? '#fff3e0' : (product.stock > 0 ? '#e8f5e9' : '#ffebee')}; color:${isComingSoon ? '#e65100' : (product.stock > 0 ? '#2e7d32' : '#c62828')}; font-weight:bold;">
                         ${isComingSoon ? '🔥 Coming Soon' : (product.stock > 0 ? `In Stock (${product.stock})` : 'Out of Stock')}
                     </span>
                 </td>
                 <td style="padding:8px;">
+                    <button onclick="openEditModal('${product.id}')" style="padding:4px 8px; font-size:11px; background:#222; color:#fff; border:none; cursor:pointer; margin-right:4px;">Edit</button>
                     <button onclick="toggleProductStatus(${idx})" style="padding:4px 8px; font-size:11px; cursor:pointer; margin-right:4px;">
                         ${isComingSoon ? 'Make Available' : 'Set Teaser'}
                     </button>
@@ -788,6 +796,55 @@ window.deleteProduct = function(id) {
         refreshAdminDashboard();
     }
 };
+
+/* --- EDIT PRODUCT HANDLERS --- */
+window.openEditModal = function(id) {
+    const product = products.find(p => String(p.id) === String(id));
+    if (!product) return;
+
+    const editId = document.getElementById('edit-prod-id');
+    const editTitle = document.getElementById('edit-prod-title');
+    const editPrice = document.getElementById('edit-prod-price');
+    const editStock = document.getElementById('edit-prod-stock');
+    const editStatus = document.getElementById('edit-prod-status');
+
+    if (editId) editId.value = product.id;
+    if (editTitle) editTitle.value = product.title;
+    if (editPrice) editPrice.value = product.price;
+    if (editStock) editStock.value = product.stock ?? 0;
+    if (editStatus) editStatus.value = product.status || 'available';
+
+    const modal = document.getElementById('edit-product-modal');
+    const overlay = document.getElementById('edit-modal-overlay') || document.getElementById('overlay');
+
+    if (modal) modal.style.display = 'block';
+    if (overlay) overlay.style.display = 'block';
+};
+
+window.closeEditModal = function() {
+    const modal = document.getElementById('edit-product-modal');
+    const overlay = document.getElementById('edit-modal-overlay') || document.getElementById('overlay');
+    if (modal) modal.style.display = 'none';
+    if (overlay) overlay.style.display = 'none';
+};
+
+function handleEditProductSubmit(e) {
+    e.preventDefault();
+    const id = document.getElementById('edit-prod-id').value;
+    const product = products.find(p => String(p.id) === String(id));
+
+    if (product) {
+        product.title = document.getElementById('edit-prod-title').value.trim();
+        product.price = parseFloat(document.getElementById('edit-prod-price').value) || 0;
+        product.stock = parseInt(document.getElementById('edit-prod-stock').value) || 0;
+        product.status = document.getElementById('edit-prod-status').value;
+
+        saveProducts();
+        refreshAdminDashboard();
+        closeEditModal();
+        alert(`Product "${product.title}" updated successfully!`);
+    }
+}
 
 /* --- WAITLIST TABLE --- */
 function renderAdminWaitlist() {
@@ -835,7 +892,7 @@ function renderAdminSales() {
             <td style="padding:8px;">${order.date}</td>
             <td style="padding:8px;">${order.customer} <br><small style="color:#666;">${order.email}</small></td>
             <td style="padding:8px;">${order.items}</td>
-            <td style="padding:8px;"><strong>R${parseFloat(order.total).toFixed(2)}</strong></td>
+            <td style="padding:8px;"><strong>E${parseFloat(order.total).toFixed(2)}</strong></td>
         </tr>
     `).join('');
 }
