@@ -2,13 +2,101 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=800">
     <title>Restyle Thrifty - Bags & Accessories</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,400&family=Great+Vibes&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://js.paystack.co/v1/inline.js"></script>
-    <link rel="manifest" href="manifest.json">
+	<!-- Favicons and iOS Apple Touch Icon -->
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+	<script src="https://js.paystack.co/v1/inline.js"></script>
+     <link rel="manifest" href="manifest.json">
+	 <script src="https://js.paystack.co/v1/inline.js"></script>
+
+	<style>
+    /* Reset & Base Styles */
+    *, *::before, *::after {
+      box-sizing: border-box !important;
+    }
+
+    html, body {
+      width: 100% !important;
+      max-width: 100vw !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      overflow-x: hidden !important;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    /* PWA Banner Styles */
+    .pwa-banner {
+      background-color: #1A1310;
+      color: #FFF3DF;
+      border-bottom: 1px solid #C88A6E;
+      padding: 10px 15px;
+    }
+
+    .pwa-btn {
+      background: linear-gradient(135deg, #E8C39E, #C88A6E);
+      color: #1A1310;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-weight: bold;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    /* Mobile Responsive Overrides */
+    @media (max-width: 768px) {
+      body {
+        font-size: 18px;
+        line-height: 1.6;
+      }
+
+      /* Stack items vertically so nothing stretches off-screen */
+      .product-grid, .grid, .products, .row {
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        gap: 20px !important;
+      }
+
+      img, svg, video {
+        max-width: 100% !important;
+        height: auto !important;
+      }
+
+      button, .btn, nav a {
+        font-size: 1rem !important;
+        padding: 12px 20px;
+      }
+    }
+
+
+/* =========================================================
+   2. SHEIN-STYLE MOBILE FEED & PRODUCT GRID
+   ========================================================= */
+/* Smooth touch scrolling for mobile */
+html, body {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Main product container */
+.product-grid, .grid, .products, #products {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important; /* Clean 2-column Shein grid */
+  gap: 12px !important;
+  padding: 12px !important;
+  width: 100% !important;
+}
+
+  </style>
+	
 </head>
 <body>
 
@@ -23,6 +111,15 @@
         </div>
     </div>
 
+<!-- Custom PWA Install Banner with Direct Download -->
+<div id="pwa-banner" class="pwa-banner">
+  <div class="pwa-banner-content">
+    <span>✨ Install <strong>Restyle</strong> on your phone!</span>
+    <a id="pwa-install-btn" href="restyle.apk" download="restyle.apk" class="pwa-btn">Download App</a>
+    <button id="pwa-close-btn" class="pwa-close" onclick="closePwaBanner()">&times;</button>
+  </div>
+</div>
+	
     <!-- Header / Navbar -->
     <header>
         <div class="brand-logo" onclick="scrollToSection('home')">
@@ -30,28 +127,28 @@
             <div class="logo-sub">— THRIFTY —</div>
             <div class="logo-tag">• BAGS & ACCESSORIES •</div>
         </div>
-        <nav class="nav-links">
-            <a href="#home" class="active">HOME</a>
-            <a href="shop.html">SHOP</a>
-            <a href="#new-arrivals">NEW ARRIVALS</a>
-            <a href="about.html">ABOUT US</a>
-            <a href="#footer">CONTACT</a>
-        </nav>
-        <div class="header-actions">
-            <i class="fas fa-search" id="open-search" title="Search"></i>
-            
-            <!-- User Account Display -->
-            <div id="account-btn-wrap" class="account-btn-wrap">
-                <i class="far fa-user" id="open-account" title="Account Login"></i>
-                <span id="user-display-name" class="user-display-name"></span>
-            </div>
+<nav class="nav-links">
+    <a href="#home" class="active">HOME</a>
+    <a href="shop.html">SHOP</a>
+    <a href="#new-arrivals">NEW ARRIVALS</a>
+    <a href="about.html">ABOUT US</a>
+    <a href="#footer">CONTACT</a>
+</nav>
+      <div class="header-actions">
+    <i class="fas fa-search" id="open-search" title="Search"></i>
+    
+    <!-- User Account Display -->
+    <div id="account-btn-wrap" class="account-btn-wrap">
+        <i class="far fa-user" id="open-account" title="Account Login"></i>
+        <span id="user-display-name" class="user-display-name"></span>
+    </div>
 
-            <!-- Cart Icon with Badge -->
-            <div class="cart-wrapper" id="open-cart" title="View Cart">
-                <i class="fas fa-shopping-bag"></i>
-                <span id="cart-count">0</span>
-            </div>
-        </div> 
+    <!-- Cart Icon with Badge -->
+    <div class="cart-wrapper" id="open-cart" title="View Cart">
+        <i class="fas fa-shopping-bag"></i>
+        <span id="cart-count">0</span>
+    </div>
+</div> 
     </header>
 
     <!-- Hero Section -->
@@ -61,10 +158,11 @@
             <h2 class="hero-title">STYLE THAT<br><span class="script-font">Completes You</span> <span class="heart">♥</span></h2>
             <p class="hero-desc">Trendy. Affordable. Yours.<br>Bags for every mood, every moment.</p>
             <div class="hero-btns">
-                <button class="btn-dark" onclick="window.location.href='shop.html'">SHOP NOW <i class="fas fa-shopping-bag"></i></button>
-                <button class="btn-outline" onclick="scrollToSection('new-arrivals')">NEW ARRIVALS &rarr;</button>
+                <button class="btn-dark" onclick="scrollToSection('categories')"><a href="shop.html">SHOP NOW</a> <i class="fas fa-shopping-bag"></i></button>
+                <button class="btn-outline" onclick="scrollToSection('new-arrivals')"><a href="#new-arrivals">NEW ARRIVALS</a> &rarr;</button>
             </div>
         </div>
+        <!-- Hero Image synced with Product ID 1 -->
         <div class="hero-image-box" data-id="1">
             <img src="https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=800&auto=format&fit=crop" alt="Featured Bags">
         </div>
@@ -88,6 +186,15 @@
             <i class="fas fa-headset"></i>
             <div><strong>CUSTOMER SUPPORT</strong><span>We're here to help</span></div>
         </div>
+    </section>
+
+    <!-- Shop By Category -->
+   
+            </div>
+            <button class="carousel-arrow right" id="slide-right"><i class="fas fa-chevron-right"></i></button>
+        </div>
+		
+		<div id="products-container" class="products-grid"></div>
     </section>
 
     <!-- New Arrivals Section -->
@@ -142,7 +249,7 @@
 
         </div>
     </section>
-
+              
     <!-- COMING SOON HIGHLIGHTS SECTION -->
     <section class="coming-soon-section" style="padding: 25px 15px; background: #fafafa; margin: 20px 0;">
         <div style="text-align:center; margin-bottom:15px;">
@@ -151,6 +258,7 @@
         </div>
 
         <div class="teaser-grid">
+            <!-- Shoes -->
             <div class="teaser-card" data-id="4">
                 <img src="https://images.unsplash.com/photo-1549298916-b41d501d3772?w=500" alt="Shoes Collection">
                 <div class="teaser-card-info">
@@ -160,6 +268,7 @@
                 </div>
             </div>
 
+            <!-- Fragrances -->
             <div class="teaser-card" data-id="5">
                 <img src="https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=500" alt="Fragrances">
                 <div class="teaser-card-info">
@@ -169,6 +278,7 @@
                 </div>
             </div>
 
+            <!-- Lip Glosses -->
             <div class="teaser-card" data-id="6">
                 <img src="https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=500" alt="Lip Glosses">
                 <div class="teaser-card-info">
@@ -178,6 +288,7 @@
                 </div>
             </div>
 
+            <!-- Apparel / Clothing -->
             <div class="teaser-card" data-id="7">
                 <img src="https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=500" alt="Thrift Clothing">
                 <div class="teaser-card-info">
@@ -188,14 +299,14 @@
             </div>
         </div>
     </section>
-
+			  
     <!-- Promo 4-Column Banner -->
     <section class="promo-grid">
         <div class="promo-text-card">
             <span class="promo-tag">NEW COLLECTION</span>
             <h2>New Styles<br><span class="script-font">Just For You</span> <span class="heart">♥</span></h2>
             <p>Discover the latest trendy bags handpicked for your everyday style.</p>
-            <button class="btn-dark" onclick="window.location.href='shop.html'">EXPLORE COLLECTION &rarr;</button>
+            <button class="btn-dark" onclick="scrollToSection('new-arrivals')"> <a href="shop.html">EXPLORE COLLECTION</a> &rarr;</button>
         </div>
         <div class="promo-img-card" data-id="2"><img src="https://images.unsplash.com/photo-1544816155-12df9643f363?w=500" alt="Look 1"></div>
         <div class="promo-img-card" data-id="1"><img src="https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=500" alt="Look 2"></div>
@@ -219,19 +330,19 @@
                     <p>Subscribe for new arrivals, special offers and exclusive updates.</p>
                 </div>
             </div>
-            <form id="newsletter-form" class="nl-form" onsubmit="event.preventDefault(); alert('Thank you for subscribing!');">
+            <form id="newsletter-form" class="nl-form">
                 <input type="email" id="newsletter-email" placeholder="Your email address" required>
                 <button type="submit">SUBSCRIBE</button>
             </form>
         </div>
 
-        <div class="footer-col contact-col">
-            <strong>CONTACT & POLICIES</strong>
-            <p style="font-size:12px; margin-top:5px;"><i class="fas fa-map-marker-alt" style="color:#9e6038;"></i> 32 Wattle Street, Dawn Park, Boksburg</p>
-            <p style="font-size:12px;"><i class="fas fa-phone" style="color:#9e6038;"></i> +27 81 538 5051 / +27 73 921 8067</p>
-            <p style="font-size:12px;"><i class="fas fa-envelope" style="color:#9e6038;"></i> gugunyawose6@gmail.com</p>
-            <p style="font-size:12px; color:#d32f2f; font-weight:bold; margin-top:5px;"><i class="fas fa-info-circle"></i> Policy: No Return / No Refund</p>
-        </div>
+       <div class="footer-col contact-col">
+    <strong>CONTACT & POLICIES</strong>
+    <p style="font-size:12px; margin-top:5px;"><i class="fas fa-map-marker-alt" style="color:#9e6038;"></i> 32 Wattle Street, Dawn Park, Boksburg</p>
+    <p style="font-size:12px;"><i class="fas fa-phone" style="color:#9e6038;"></i> +27 81 538 5051 / +27 73 921 8067</p>
+    <p style="font-size:12px;"><i class="fas fa-envelope" style="color:#9e6038;"></i> gugunyawose6@gmail.com</p>
+    <p style="font-size:12px; color:#d32f2f; font-weight:bold; margin-top:5px;"><i class="fas fa-info-circle"></i> Policy: No Return / No Refund</p>
+</div>
 
         <div class="footer-col links-col">
             <strong>QUICK LINKS</strong>
@@ -239,12 +350,14 @@
             <a href="#new-arrivals">New Arrivals</a>
             <a href="about.html">About Us</a>
             <a href="#footer">Contact Us</a>
+            <a href="#footer">FAQs</a>
         </div>
 
         <div class="footer-col links-col">
             <strong>CUSTOMER CARE</strong>
             <a href="#">Shipping & Delivery</a>
             <a href="#">Returns & Exchanges</a>
+            <a href="#">Size Guide</a>
             <a href="#">Track Your Order</a>
             <a href="#">Help Center</a>
         </div>
@@ -261,7 +374,7 @@
     </footer>
 
     <div class="copyright-bar">
-        <span class="heart">♥</span> &nbsp; © 2026 Restyle Thrifty. All Rights Reserved. &nbsp; <span class="heart">♥</span>
+        <span class="heart">♥</span> &nbsp; © 2024 Restyle Thrifty. All Rights Reserved. &nbsp; <span class="heart">♥</span>
     </div>
 
     <!-- Modals & Cart Drawer -->
@@ -287,66 +400,149 @@
         <div class="modal-box">
             <span class="close-btn" id="close-search">&times;</span>
             <h3>Search Products</h3>
-            <div class="search-flex" style="display:flex; gap:10px;">
-                <input type="text" id="search-input" placeholder="Search for handbags, totes, backpacks..." style="flex:1; padding:8px;">
-                <button onclick="performSearch()" class="btn-dark"><i class="fas fa-search"></i></button>
+            <div class="search-flex">
+                <input type="text" id="search-input" placeholder="Search for handbags, totes, backpacks...">
+                <button onclick="performSearch()"><i class="fas fa-search"></i></button>
             </div>
         </div>
     </div>
 
-    <div class="modal" id="account-modal">
-        <div class="modal-box">
-            <span class="close-btn" id="close-account">&times;</span>
-            <h3>Customer Login</h3>
-            <form id="customer-login-form" onsubmit="event.preventDefault(); alert('Logged in successfully!'); closeAllModals();">
-                <input type="text" id="customer-username" placeholder="Username / Your Name" required class="modal-input" style="width:100%; padding:8px; margin-bottom:8px;">
-                <input type="email" id="customer-email" placeholder="Email Address" required class="modal-input" style="width:100%; padding:8px; margin-bottom:8px;">
-                <input type="password" placeholder="Password" required class="modal-input" style="width:100%; padding:8px; margin-bottom:12px;">
-                <button type="submit" class="btn-dark full-btn">SIGN IN</button>
-            </form>
+   <div class="modal" id="account-modal">
+    <div class="modal-box">
+        <span class="close-btn" id="close-account">&times;</span>
+        <h3>Customer Login</h3>
+        <form id="customer-login-form">
+            <input type="text" id="customer-username" placeholder="Username / Your Name" required class="modal-input">
+            <input type="email" id="customer-email" placeholder="Email Address" required class="modal-input">
+            <input type="password" placeholder="Password" required class="modal-input">
+            <button type="submit" class="btn-dark full-btn">SIGN IN</button>
+        </form>
+    </div>
+</div>
+
+<div id="checkout-modal" class="modal" style="display:none;">
+    <div class="modal-content" style="padding:20px; background:#fff; max-width:450px; margin:auto; border-radius:8px;">
+        <span class="close-btn" onclick="closeAllModals()" style="float:right; cursor:pointer; font-size:20px;">&times;</span>
+        <h3 style="margin-top:0;">Delivery & Payment</h3>
+        <p style="font-size:11px; color:#c62828; font-weight:bold; margin-bottom:12px;">* All fields are required. Store Policy: No Return, No Refund.</p>
+
+        <!-- Mandatory Inputs -->
+        <input type="text" id="checkout-name" placeholder="Full Name *" required style="width:100%; margin-bottom:8px; padding:9px; box-sizing:border-box; border:1px solid #ccc; border-radius:4px; font-size:13px;">
+        <input type="email" id="checkout-email" placeholder="Email Address *" required style="width:100%; margin-bottom:8px; padding:9px; box-sizing:border-box; border:1px solid #ccc; border-radius:4px; font-size:13px;">
+        <input type="tel" id="checkout-phone" placeholder="Phone / WhatsApp Number *" required style="width:100%; margin-bottom:8px; padding:9px; box-sizing:border-box; border:1px solid #ccc; border-radius:4px; font-size:13px;">
+
+        <!-- Delivery Selection -->
+        <label style="font-size:12px; font-weight:bold; display:block; margin-top:6px; margin-bottom:4px;">Delivery Method *:</label>
+        <select id="checkout-delivery-method" onchange="updateCheckoutTotals()" required style="width:100%; margin-bottom:8px; padding:9px; box-sizing:border-box; border:1px solid #ccc; border-radius:4px; font-size:13px;">
+            <option value="pickup">Local Pickup (R0.00)</option>
+            <option value="paxi">PAXI Point-to-Point</option>
+            <option value="pudo_locker">PUDO Locker-to-Locker</option>
+            <option value="pudo_door">PUDO Locker-to-Door</option>
+        </select>
+
+        <textarea id="checkout-address" placeholder="Physical Address OR Paxi / Pudo Locker Store Name & Code *" required style="width:100%; margin-bottom:8px; padding:9px; box-sizing:border-box; height:60px; border:1px solid #ccc; border-radius:4px; font-size:12px; resize:vertical;"></textarea>
+
+        <!-- Live Totals Display -->
+        <div style="margin-top:10px; display:flex; justify-content:space-between; font-size:13px;">
+            <span>Shipping Fee:</span>
+            <strong id="checkout-shipping-cost">R0.00 (Free)</strong>
+        </div>
+        <div style="margin-top:4px; display:flex; justify-content:space-between; font-size:16px; border-bottom:1px solid #eee; padding-bottom:8px;">
+            <span>Grand Total:</span>
+            <strong id="checkout-grand-total">R0.00</strong>
+        </div>
+
+        <!-- Action Buttons -->
+        <div style="display:flex; flex-direction:column; gap:8px; margin-top:12px;">
+            <button type="button" class="btn-dark full-btn" onclick="payWithPaystack()" style="padding:10px; cursor:pointer; font-weight:bold; display:flex; align-items:center; justify-content:center; gap:8px;">
+                <i class="fas fa-credit-card"></i> Pay Online (Paystack)
+            </button>
+
+            <button type="button" class="btn-primary full-btn" onclick="toggleEftDetails()" style="padding:10px; cursor:pointer; font-weight:bold; background:#444; border-color:#444; color:#fff; display:flex; align-items:center; justify-content:center; gap:8px;">
+                <i class="fas fa-university"></i> Manual Bank Transfer (EFT)
+            </button>
+        </div>
+
+        <!-- Hidden Bank Details -->
+        <div id="eft-details" style="display:none; margin-top:12px; padding:12px; background:#f9f9f9; border:1px solid #ddd; border-radius:4px; font-size:12px;">
+            <strong>Banking Details for Manual Payment:</strong>
+            <p style="margin:3px 0;"><strong>Bank:</strong> FNB</p>
+            <p style="margin:3px 0;"><strong>Account Name:</strong> O'L VILAKAZI</p>
+            <p style="margin:3px 0;"><strong>Account Number:</strong> 62670200048</p>
+            <p style="margin:3px 0;"><strong>Branch Code:</strong> 250655</p>
+            <p style="margin:3px 0; color:#d32f2f;"><strong>Reference:</strong> Use Your Phone Number</p>
+            <hr style="margin:8px 0; border:0; border-top:1px solid #ccc;">
+            <button type="button" class="btn-dark full-btn" onclick="completeEftOrder()" style="padding:9px; font-size:12px; width:100%; cursor:pointer;">
+                CONFIRM EFT ORDER
+            </button>
         </div>
     </div>
-
-    <!-- Checkout Payment & Delivery Modal -->
-    <div class="modal" id="checkout-modal">
-        <div class="modal-box" style="max-width:480px;">
-            <span class="close-btn" id="close-checkout">&times;</span>
-            <h3>Delivery & Payment</h3>
-            <p style="font-size:12px; color:#666; margin-top:4px; margin-bottom:12px;">Enter your delivery details before choosing a payment method:</p>
-            
-            <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:15px; text-align:left;">
-                <input type="tel" id="delivery-phone" placeholder="Phone / WhatsApp Number *" required style="padding:9px; border:1px solid #ccc; border-radius:4px; font-size:13px;">
-                <input type="text" id="delivery-address" placeholder="Street Address (House/Apt, Street Name) *" required style="padding:9px; border:1px solid #ccc; border-radius:4px; font-size:13px;">
-                <div style="display:flex; gap:8px;">
-                    <input type="text" id="delivery-suburb" placeholder="Suburb / Town *" required style="flex:1; padding:9px; border:1px solid #ccc; border-radius:4px; font-size:13px;">
-                    <input type="text" id="delivery-city" placeholder="City *" required style="flex:1; padding:9px; border:1px solid #ccc; border-radius:4px; font-size:13px;">
-                </div>
-                <textarea id="delivery-notes" placeholder="Special Delivery Instructions / Gate Code (Optional)" style="padding:9px; border:1px solid #ccc; border-radius:4px; font-size:12px; height:50px; resize:vertical;"></textarea>
-            </div>
-
-            <div style="display:flex; flex-direction:column; gap:10px;">
-                <button class="btn-dark full-btn" onclick="payWithPaystack()" style="display:flex; align-items:center; justify-content:center; gap:8px;">
-                    <i class="fas fa-credit-card"></i> Pay with Card
-                </button>
-
-                <button class="btn-primary full-btn" onclick="toggleEftDetails()" style="display:flex; align-items:center; justify-content:center; gap:8px; background:#444; color:#fff; border-color:#444;">
-                    <i class="fas fa-university"></i> Manual Bank Transfer (EFT)
-                </button>
-            </div>
-
-            <div id="eft-details" style="display:none; margin-top:15px; padding:12px; background:#f9f9f9; border:1px solid #ddd; border-radius:4px; font-size:12px; text-align:left;">
-                <strong style="color:#222; display:block; margin-bottom:6px;">Banking Details for Manual Payment:</strong>
-                <p style="margin:3px 0;"><strong>Bank:</strong> Capitec Bank / FNB</p>
-                <p style="margin:3px 0;"><strong>Account Name:</strong> Restyle Thrifty</p>
-                <p style="margin:3px 0;"><strong>Account Number:</strong> 1234567890</p>
-                <p style="margin:3px 0;"><strong>Branch Code:</strong> 470010</p>
-                <p style="margin:3px 0; color:#d32f2f;"><strong>Reference:</strong> Your Full Name</p>
-                <hr style="margin:8px 0; border:0; border-top:1px solid #eee;">
-                <button class="btn-dark full-btn" onclick="completeEftOrder()" style="margin-top:6px; padding:8px; font-size:12px;">CONFIRM EFT ORDER</button>
-            </div>
-        </div>
+</div>
+<div id="receipt-modal" class="modal" style="display:none;">
+    <div class="modal-content" style="padding:20px; background:#fff; max-width:400px; margin:auto; border-radius:8px; text-align:center;">
+        <span class="close-btn" onclick="closeAllModals()" style="float:right; cursor:pointer;">&times;</span>
+        <h3>Order Confirmation</h3>
+        <div id="receipt-details-content"></div>
+        <div id="whatsapp-btn-container"></div>
     </div>
+</div>
+ 
+<script>
+  let deferredPrompt;
+  const pwaBanner = document.getElementById('pwa-banner');
+  const installBtn = document.getElementById('pwa-install-btn');
 
-    <script src="script.js"></script>
+  // Register Service Worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW Error:', err));
+  }
+
+  // Hide banner if app is ALREADY open as an installed app
+  if (window.matchMedia('(display-mode: standalone)').matches) {
+    if (pwaBanner) pwaBanner.style.display = 'none';
+  }
+
+  // Catch native PWA prompt if browser supports it
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+  });
+
+  if (installBtn) {
+    installBtn.addEventListener('click', (e) => {
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+      if (deferredPrompt) {
+        // Option A: Trigger native PWA installer if available
+        e.preventDefault();
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(({ outcome }) => {
+          if (outcome === 'accepted') {
+            if (pwaBanner) pwaBanner.style.display = 'none';
+          }
+          deferredPrompt = null;
+        });
+      } else if (isIOS) {
+        // Option B: Show iPhone instructions
+        e.preventDefault();
+        alert("To install Restyle on iPhone:\n\n1. Tap the Share button at the bottom of Safari.\n2. Scroll down and tap 'Add to Home Screen'.");
+      } 
+      // Option C: If on Android and native prompt isn't ready, 
+      // clicking the button will automatically download 'restyle.apk'!
+    });
+  }
+
+  function closePwaBanner() {
+    if (pwaBanner) pwaBanner.style.display = 'none';
+  }
+	// Handles active state switching when a category pill is tapped
+  document.querySelectorAll('.cat-pill').forEach(pill => {
+    pill.addEventListener('click', function() {
+      document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+</script>
+    <script src="script.js"></script>	
 </body>
 </html>
