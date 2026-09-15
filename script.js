@@ -123,7 +123,7 @@ function saveWaitlist() {
     localStorage.setItem('restyle_waitlist', JSON.stringify(waitlist));
 }
 
-/* --- STOREFRONT RENDERING --- */
+/* --- STOREFRONT RENDERING (UPDATED CARD LAYOUT ONLY) --- */
 window.renderStorefrontProducts = function() {
     const container = document.getElementById('products-container');
     if (!container) return;
@@ -174,19 +174,19 @@ window.renderStorefrontProducts = function() {
         
         return `
             <div class="product-card">
-                <div class="product-img-box">
-                    <img src="${product.image}" alt="${product.title}">
+                <div class="product-img-box" style="position:relative; width:100%; height:180px; overflow:hidden; border-radius:6px 6px 0 0;">
+                    <img src="${product.image}" alt="${product.title}" style="width:100%; height:100%; object-fit:cover;">
                     ${statusBadge}
                 </div>
-                <div class="product-info">
-                    <h4>${product.title}</h4>
-                    <div class="product-price">R${parseFloat(product.price).toFixed(2)}</div>
+                <div class="product-info" style="padding:10px; text-align:center;">
+                    <h4 style="font-size:12px; margin:4px 0; color:#333; height:32px; overflow:hidden;">${product.title}</h4>
+                    <div class="product-price" style="font-weight:bold; font-size:13px; margin-bottom:4px;">R${parseFloat(product.price).toFixed(2)}</div>
                     
-                    <div class="stock-status" style="font-size:11px; margin-bottom:8px; font-weight:bold; color: ${isComingSoon ? '#e65100' : (isOutOfStock ? '#d32f2f' : '#2e7d32')};">
-                        ${isComingSoon ? '⏳ Launching Soon' : (isOutOfStock ? '❌ Out of Stock' : `✔ In Stock: ${stockQty}`)}
+                    <div class="stock-status" style="font-size:10px; margin-bottom:6px; font-weight:600; color: ${isComingSoon ? '#e65100' : (isOutOfStock ? '#d32f2f' : '#2e7d32')};">
+                        ${isComingSoon ? '⏳ Launching Soon' : (isOutOfStock ? '✘ Out of Stock' : `✔ In Stock: ${stockQty}`)}
                     </div>
 
-                    <button type="button" class="btn-dark full-btn" ${(isOutOfStock || isComingSoon) ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''} onclick="addToCart('${product.id}')">
+                    <button type="button" class="btn-dark full-btn" style="width:100%; padding:6px 0; font-size:11px;" ${(isOutOfStock || isComingSoon) ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''} onclick="addToCart('${product.id}')">
                         <i class="fas fa-shopping-bag"></i> ${isComingSoon ? 'COMING SOON' : (isOutOfStock ? 'OUT OF STOCK' : 'ADD TO CART')}
                     </button>
                 </div>
