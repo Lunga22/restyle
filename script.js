@@ -123,7 +123,7 @@ function saveWaitlist() {
     localStorage.setItem('restyle_waitlist', JSON.stringify(waitlist));
 }
 
-/* --- STOREFRONT RENDERING (UPDATED CARD LAYOUT ONLY) --- */
+/* --- STOREFRONT RENDERING --- */
 window.renderStorefrontProducts = function() {
     const container = document.getElementById('products-container');
     if (!container) return;
@@ -719,21 +719,50 @@ function renderAdminProducts() {
         return;
     }
 
-    tbody.innerHTML = products.map((product) => `
-        <tr>
-            <td style="padding:8px;"><img src="${product.image}" style="width:40px; height:40px; object-fit:cover; border-radius:4px;"></td>
-            <td style="padding:8px;"><strong>${product.title}</strong></td>
-            <td style="padding:8px;">${product.category || 'N/A'}</td>
-            <td style="padding:8px;">R${parseFloat(product.price).toFixed(2)}</td>
-            <td style="padding:8px;">
-                <input type="number" value="${product.stock}" min="0" onchange="updateProductStock('${product.id}', this.value)" style="width:60px; padding:4px;">
-            </td>
-            <td style="padding:8px;">
-                <button onclick="deleteProduct('${product.id}')" style="color:red; background:none; border:none; cursor:pointer;"><i class="fas fa-trash"></i> Delete</button>
-            </td>
-        </tr>
-    `).join('');
+    tbody.innerHTML = products.map((product) => {
+        const stockQty = parseInt(product.stock) || 0;
+        const isTeaser = product.status === 'coming_soon';
+        const isOutOfStock = stockQty <= 0 && !isTeaser;
+
+        let badgeHtml = '';
+        if (isTeaser) {
+            badgeHtml = `<span style="background-color: #ffebee; color: #c62828; font-weight: 600; padding: 4px 8px; border-radius: 4px; font-size: 11px;">Out of Stock</span>`;
+        } else if (isOutOfStock) {
+            badgeHtml = `<span style="background-color: #ffebee; color: #c62828; font-weight: 600; padding: 4px 8px; border-radius: 4px; font-size: 11px;">Out of Stock</span>`;
+        } else {
+            badgeHtml = `<span style="background-color: #e8f5e9; color: #2e7d32; font-weight: 600; padding: 4px 8px; border-radius: 4px; font-size: 11px;">In Stock (${stockQty})</span>`;
+        }
+
+        return `
+            <tr>
+                <td style="padding:10px;"><img src="${product.image}" style="width:40px; height:40px; object-fit:cover; border-radius:4px;"></td>
+                <td style="padding:10px;"><strong>${product.title}</strong></td>
+                <td style="padding:10px; color:#555;">${product.category || 'N/A'}</td>
+                <td style="padding:10px;">R${parseFloat(product.price).toFixed(2)}</td>
+                <td style="padding:10px;">
+                    ${badgeHtml}
+                </td>
+                <td style="padding:10px;">
+                    <button onclick="toggleTeaserStatus('${product.id}')" class="btn-small" style="background: #e0e0e0; color: #333; margin-right: 5px; border: 1px solid #ccc; padding: 4px 8px; font-size: 11px; cursor:pointer;">
+                        ${isTeaser ? 'Unset Teaser' : 'Set Teaser'}
+                    </button>
+                    <button onclick="deleteProduct('${product.id}')" class="btn-small btn-danger" style="padding: 4px 8px; font-size: 11px; cursor:pointer;">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+        `;
+    }).join('');
 }
+
+window.toggleTeaserStatus = function(id) {
+    const prod = products.find(p => String(p.id) === String(id));
+    if (prod) {
+        prod.status = (prod.status === 'coming_soon') ? 'available' : 'coming_soon';
+        saveProducts();
+        refreshAdminDashboard();
+    }
+};
 
 function renderAdminWaitlist() {
     const tbody = document.getElementById('admin-waitlist-rows');
