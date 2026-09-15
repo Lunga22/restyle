@@ -863,6 +863,7 @@ button:active, .btn-dark:active {
 
 .btn-edit { background: #9e6038; color: #fff; }
 .btn-danger { background: #d9534f; color: #fff; }
+.  { border: 1px solid #fff; color: #fff; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 12px; }
 
 /* TABLET RESPONSIVENESS (Max Width: 1024px) */
 @media (max-width: 1024px) {
