@@ -53,6 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (document.getElementById('products-container')) {
         renderStorefrontProducts();
+        renderComingSoonSection();
     }
 
     if (document.getElementById('admin-dashboard') || document.getElementById('admin-login-screen')) {
@@ -195,6 +196,36 @@ window.renderStorefrontProducts = function() {
     }).join('');
 
     renderPagination(totalResults);
+};
+
+window.renderComingSoonSection = function() {
+    const container = document.getElementById('coming-soon-container');
+    if (!container) return;
+
+    const teaserProducts = products.filter(p => p.status === 'coming_soon');
+
+    if (teaserProducts.length === 0) {
+        container.innerHTML = `<p style="text-align:center; color:#777; width:100%; padding:20px; grid-column: 1 / -1;">No upcoming items at the moment. Check back soon!</p>`;
+        return;
+    }
+
+    container.innerHTML = teaserProducts.map(product => `
+        <div class="teaser-card product-card" style="border: 1px solid #ffe0b2; background: #fff8e1; border-radius: 8px; overflow: hidden; position: relative;">
+            <div class="product-img-box" style="position:relative; width:100%; height:160px;">
+                <img src="${product.image}" alt="${product.title}" style="width:100%; height:100%; object-fit:cover;">
+                <span class="category-badge" style="background:#e65100; color:#fff;">🔥 Coming Soon</span>
+            </div>
+            <div style="padding:10px; text-align:center;">
+                <h4 style="font-size:12px; margin:4px 0; color:#333;">${product.title}</h4>
+                <div style="font-weight:bold; font-size:13px; color:#e65100; margin-bottom:6px;">R${parseFloat(product.price).toFixed(2)}</div>
+                <button type="button" class="btn-dark full-btn" style="width:100%; padding:6px 0; font-size:11px; background:#e65100; border:none; color:#fff; cursor:pointer;">
+                    NOTIFY ME
+                </button>
+            </div>
+        </div>
+    `).join('');
+
+    initComingSoon();
 };
 
 function renderPagination(totalItems) {
@@ -689,6 +720,10 @@ window.refreshAdminDashboard = function() {
     renderAdminProducts();
     renderAdminWaitlist();
     renderAdminSales();
+    if (document.getElementById('products-container')) {
+        renderStorefrontProducts();
+        renderComingSoonSection();
+    }
 };
 
 function renderAdminStats() {
@@ -726,7 +761,7 @@ function renderAdminProducts() {
 
         let badgeHtml = '';
         if (isTeaser) {
-            badgeHtml = `<span style="background-color: #ffebee; color: #c62828; font-weight: 600; padding: 4px 8px; border-radius: 4px; font-size: 11px;">Out of Stock</span>`;
+            badgeHtml = `<span style="background-color: #fff3e0; color: #e65100; font-weight: 600; padding: 4px 8px; border-radius: 4px; font-size: 11px;">Coming Soon</span>`;
         } else if (isOutOfStock) {
             badgeHtml = `<span style="background-color: #ffebee; color: #c62828; font-weight: 600; padding: 4px 8px; border-radius: 4px; font-size: 11px;">Out of Stock</span>`;
         } else {
