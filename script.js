@@ -1,8 +1,7 @@
 /* ==========================================================================
-   RESTYLE THRIFTY - COMPLETE CORE SCRIPT WITH SA VALIDATION & NOTIFICATIONS
+   RESTYLE THRIFTY - COMPLETE CORE SCRIPT WITH INTEGRATED ADMIN CONTROLS
    ========================================================================== */
 
-// Store Merchant Details
 const STORE_CONFIG = {
     merchantPhone: '+27815385051',
     merchantEmail: 'gugunyawose6@gmail.com',
@@ -22,6 +21,7 @@ let products = [];
 let cart = [];
 let currentUser = null;
 let orders = [];
+let waitlist = [];
 
 let activeFilters = {
     category: 'all',
@@ -36,6 +36,7 @@ let activeFilters = {
 document.addEventListener('DOMContentLoaded', () => {
     loadProducts();
     loadOrders();
+    loadWaitlist();
     initCart();
     initModals();
     initLogin();
@@ -60,15 +61,12 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /* --- PHONE VALIDATION & ESTIMATED DELIVERY LOGIC --- */
-
-// Validates standard SA formats: 0815385051, +27815385051, 0721234567, etc.
 function isValidSAPhone(phone) {
     const cleanPhone = phone.replace(/[\s\-\(\)]/g, '');
     const saRegex = /^(\+27|0)[678]\d{8}$/;
     return saRegex.test(cleanPhone);
 }
 
-// Format phone to standard international format (+27...)
 function formatSAPhone(phone) {
     let clean = phone.replace(/[\s\-\(\)]/g, '');
     if (clean.startsWith('0')) {
@@ -77,7 +75,6 @@ function formatSAPhone(phone) {
     return clean;
 }
 
-// Get delivery timeframes depending on method
 function getEstimatedDeliveryTime(deliveryMethod) {
     switch (deliveryMethod) {
         case 'paxi':
@@ -115,6 +112,15 @@ function loadOrders() {
 
 function saveOrders() {
     localStorage.setItem('restyle_orders', JSON.stringify(orders));
+}
+
+function loadWaitlist() {
+    const saved = localStorage.getItem('restyle_waitlist');
+    try { waitlist = saved ? JSON.parse(saved) : []; } catch (e) { waitlist = []; }
+}
+
+function saveWaitlist() {
+    localStorage.setItem('restyle_waitlist', JSON.stringify(waitlist));
 }
 
 /* --- STOREFRONT RENDERING --- */
@@ -363,7 +369,6 @@ window.updateCheckoutTotals = function() {
     grandTotalDisplay.innerText = `R${grandTotal.toFixed(2)}`;
 };
 
-/* --- FORM VALIDATION WITH SOUTH AFRICAN PHONE RULES --- */
 function validateCheckoutForm() {
     const name = document.getElementById('checkout-name')?.value.trim();
     const email = document.getElementById('checkout-email')?.value.trim();
@@ -377,41 +382,23 @@ function validateCheckoutForm() {
         return null;
     }
     if (!email || !email.includes('@') || !email.includes('.')) {
-        alert('Please enter a valid Email Address for order confirmation.');
+        alert('Please enter a valid Email Address.');
         document.getElementById('checkout-email')?.focus();
         return null;
     }
-    if (!phone) {
-        alert('Please enter your Phone Number.');
-        document.getElementById('checkout-phone')?.focus();
-        return null;
-    }
-    if (!isValidSAPhone(phone)) {
-        alert('Please enter a valid South African phone number.\n\nAccepted formats:\n• 0815385051 (10 digits starting with 06, 07, or 08)\n• +27815385051 (International format)');
+    if (!phone || !isValidSAPhone(phone)) {
+        alert('Please enter a valid South African phone number.');
         document.getElementById('checkout-phone')?.focus();
         return null;
     }
     if (!deliveryMethod) {
         alert('Please select a Delivery Method.');
-        document.getElementById('checkout-delivery-method')?.focus();
-        return null;
-    }
-    if (deliveryMethod !== 'pickup' && !address) {
-        alert('Please enter your Delivery Address or Paxi / Pudo Locker Store Name & Code.');
-        document.getElementById('checkout-address')?.focus();
         return null;
     }
 
-    return { 
-        name, 
-        email, 
-        phone: formatSAPhone(phone), 
-        deliveryMethod, 
-        address: address || 'Local Pick Up' 
-    };
+    return { name, email, phone: formatSAPhone(phone), deliveryMethod, address: address || 'Local Pick Up' };
 }
 
-/* --- CHECKOUT TRIGGER --- */
 window.checkout = function() {
     const totalQty = cart.reduce((sum, item) => sum + (item.qty || 1), 0);
     if (totalQty <= 0) {
@@ -428,43 +415,22 @@ window.checkout = function() {
     }
 };
 
-
-/* --- PAYMENT INTEGRATION & AUTOMATED NOTIFICATIONS --- */
 window.payWithPaystack = function() {
-    const totalQty = cart.reduce((sum, item) => sum + (item.qty || 1), 0);
-    if (totalQty <= 0) {
-        alert('Your cart is empty!');
-        return;
-    }
-
     const customer = validateCheckoutForm();
     if (!customer) return;
 
+    const totalQty = cart.reduce((sum, item) => sum + (item.qty || 1), 0);
     const subtotal = calculateCartTotal();
     const shippingCost = calculateShippingCost(customer.deliveryMethod, totalQty);
     const grandTotal = subtotal + shippingCost;
-    const grandTotalInCents = Math.round(grandTotal * 100);
-
-    if (typeof PaystackPop === 'undefined') {
-        alert('Paystack library is not loaded. Please ensure the Paystack script tag is present.');
-        return;
-    }
 
     let handler = PaystackPop.setup({
         key: 'pk_test_4949998eff8859d813c87a650de5202160e3f4ad',
         email: customer.email,
-        amount: grandTotalInCents,
+        amount: Math.round(grandTotal * 100),
         currency: 'ZAR',
         callback: function(response) {
-            processOrderCompletion('Paystack Online', response.reference, {
-                ...customer,
-                subtotal,
-                shippingCost,
-                grandTotal
-            });
-        },
-        onClose: function() {
-            alert('Payment window closed. Order was not completed.');
+            processOrderCompletion('Paystack Online', response.reference, { ...customer, subtotal, shippingCost, grandTotal });
         }
     });
 
@@ -479,37 +445,19 @@ window.toggleEftDetails = function() {
 };
 
 window.completeEftOrder = function() {
-    const totalQty = cart.reduce((sum, item) => sum + (item.qty || 1), 0);
-    if (totalQty <= 0) {
-        alert('Your cart is empty!');
-        return;
-    }
-
     const customer = validateCheckoutForm();
     if (!customer) return;
 
+    const totalQty = cart.reduce((sum, item) => sum + (item.qty || 1), 0);
     const subtotal = calculateCartTotal();
     const shippingCost = calculateShippingCost(customer.deliveryMethod, totalQty);
     const grandTotal = subtotal + shippingCost;
 
-    processOrderCompletion('Manual Bank Transfer (EFT)', 'EFT-PENDING-' + Math.floor(100000 + Math.random() * 900000), {
-        ...customer,
-        subtotal,
-        shippingCost,
-        grandTotal
-    });
+    processOrderCompletion('Manual Bank Transfer (EFT)', 'EFT-' + Date.now(), { ...customer, subtotal, shippingCost, grandTotal });
 };
 
 function processOrderCompletion(paymentMethod, reference, customerData) {
-    let itemsSummary = [];
-
-    cart.forEach(cartItem => {
-        const prod = products.find(p => String(p.id) === String(cartItem.id));
-        if (prod) prod.stock = Math.max(0, (parseInt(prod.stock) || 0) - cartItem.qty);
-        itemsSummary.push(`${cartItem.qty}x ${cartItem.title}`);
-    });
-
-    const estDeliveryTime = getEstimatedDeliveryTime(customerData.deliveryMethod);
+    let itemsSummary = cart.map(item => `${item.qty}x ${item.title}`);
 
     loadOrders();
     const newOrder = {
@@ -520,7 +468,7 @@ function processOrderCompletion(paymentMethod, reference, customerData) {
         phone: customerData.phone,
         address: customerData.address,
         deliveryMethod: customerData.deliveryMethod,
-        estimatedDelivery: estDeliveryTime,
+        estimatedDelivery: getEstimatedDeliveryTime(customerData.deliveryMethod),
         items: itemsSummary.join(', '),
         subtotal: customerData.subtotal,
         shippingCost: customerData.shippingCost,
@@ -531,63 +479,14 @@ function processOrderCompletion(paymentMethod, reference, customerData) {
 
     orders.unshift(newOrder);
     saveOrders();
-    saveProducts();
-
-    // Trigger Automated Confirmations to Customer & Store Owner
-    dispatchAutomatedNotifications(newOrder);
 
     cart = [];
     saveCart();
     closeAllModals();
 
-    if (document.getElementById('products-container')) renderStorefrontProducts();
+    alert(`🎉 THANK YOU FOR YOUR ORDER!\n\nOrder ID: ${newOrder.id}\nEstimated Delivery: ${newOrder.estimatedDelivery}`);
 }
 
-/* --- AUTOMATED CONFIRMATION DISPATCHER --- */
-function dispatchAutomatedNotifications(order) {
-    const smsMessage = `Hi ${order.customer}! Restyle Thrifty order ${order.id} confirmed! Total: R${order.total.toFixed(2)}. Est. Delivery: ${order.estimatedDelivery}. Contact us: ${STORE_CONFIG.merchantPhone}`;
-    
-    const emailSubject = `Order Confirmation #${order.id} - Restyle Thrifty`;
-    const emailBody = `
-Dear ${order.customer},
-
-Thank you for shopping with Restyle Thrifty!
-
---- ORDER DETAILS ---
-Order Number: ${order.id}
-Date: ${order.date}
-Items: ${order.items}
-Shipping Method: ${order.deliveryMethod}
-Estimated Delivery Time: ${order.estimatedDelivery}
-
---- PAYMENT SUMMARY ---
-Subtotal: R${order.subtotal.toFixed(2)}
-Shipping Fee: R${order.shippingCost.toFixed(2)}
-Total Paid: R${order.total.toFixed(2)}
-Payment Method: ${order.paymentMethod}
-Reference: ${order.reference}
-
-Support Contact:
-Email: ${STORE_CONFIG.merchantEmail}
-Phone/WhatsApp: ${STORE_CONFIG.merchantPhone}
-    `;
-
-    // Simulated Email Notification
-    console.log(`[AUTOMATED EMAIL SENT TO ${order.email}]:\nSubject: ${emailSubject}\n${emailBody}`);
-
-    // Simulated SMS Notification
-    console.log(`[AUTOMATED SMS SENT TO ${order.phone}]:\n${smsMessage}`);
-
-    // Display confirmation popup on screen
-    alert(`🎉 THANK YOU FOR YOUR ORDER!\n\n` +
-          `Order ID: ${order.id}\n` +
-          `Estimated Delivery: ${order.estimatedDelivery}\n\n` +
-          `✉️ Automated confirmation sent to: ${order.email}\n` +
-          `📱 Automated SMS sent to: ${order.phone}\n\n` +
-          `For inquiries, contact us at ${STORE_CONFIG.merchantPhone} or ${STORE_CONFIG.merchantEmail}.`);
-}
-
-/* --- USER LOGIN & MODALS --- */
 function initLogin() {
     const loginForm = document.getElementById('customer-login-form');
     if (loginForm) {
@@ -595,21 +494,15 @@ function initLogin() {
             e.preventDefault();
             const usernameInput = document.getElementById('customer-username');
             const emailInput = document.getElementById('customer-email');
-            const username = usernameInput ? usernameInput.value.trim() : 'Customer';
-            const email = emailInput ? emailInput.value.trim() : 'customer@restylethrifty.com';
-
-            currentUser = { username, email };
+            currentUser = { username: usernameInput ? usernameInput.value.trim() : 'Customer', email: emailInput ? emailInput.value.trim() : '' };
             localStorage.setItem('restyle_user', JSON.stringify(currentUser));
-            alert(`Welcome, ${username}! You are now logged in.`);
             closeAllModals();
             updateUserHeader();
         });
     }
 
     const savedUser = localStorage.getItem('restyle_user');
-    if (savedUser) {
-        try { currentUser = JSON.parse(savedUser); updateUserHeader(); } catch (e) { localStorage.removeItem('restyle_user'); }
-    }
+    if (savedUser) { try { currentUser = JSON.parse(savedUser); updateUserHeader(); } catch (e) {} }
 }
 
 function updateUserHeader() {
@@ -617,20 +510,10 @@ function updateUserHeader() {
     const nameLabel = document.getElementById('user-display-name');
 
     if (currentUser && currentUser.username) {
-        if (accountIcon) { accountIcon.className = 'fas fa-user-check'; accountIcon.style.color = '#9e6038'; }
-        if (nameLabel) nameLabel.innerHTML = `Hi, ${currentUser.username} <small onclick="logoutCustomer()" style="cursor:pointer; color:#999; margin-left:4px;">(Logout)</small>`;
-    } else {
-        if (accountIcon) { accountIcon.className = 'far fa-user'; accountIcon.style.color = ''; }
-        if (nameLabel) nameLabel.innerHTML = '';
+        if (accountIcon) accountIcon.className = 'fas fa-user-check';
+        if (nameLabel) nameLabel.innerHTML = `Hi, ${currentUser.username}`;
     }
 }
-
-window.logoutCustomer = function() {
-    localStorage.removeItem('restyle_user');
-    currentUser = null;
-    updateUserHeader();
-    alert('You have logged out.');
-};
 
 function initModals() {
     const openSearch = document.getElementById('open-search');
@@ -643,12 +526,7 @@ function initModals() {
     const overlay = document.getElementById('overlay');
 
     if (openSearch) openSearch.addEventListener('click', () => showModal(searchModal));
-    if (openAccount) openAccount.addEventListener('click', () => {
-        if (currentUser) {
-            if (confirm(`Logged in as ${currentUser.username}. Do you want to logout?`)) logoutCustomer();
-        } else showModal(accountModal);
-    });
-
+    if (openAccount) openAccount.addEventListener('click', () => showModal(accountModal));
     if (openCart) openCart.addEventListener('click', () => {
         if (cartDrawer) cartDrawer.classList.add('open');
         if (overlay) overlay.style.display = 'block';
@@ -675,39 +553,41 @@ function closeAllModals() {
 
 function attachGlobalButtonListeners() {
     document.body.addEventListener('click', (e) => {
-        const btn = e.target.closest('.add-to-cart-btn, .btn-add-cart');
+        const btn = e.target.closest('.add-to-cart-btn');
         if (btn && !btn.getAttribute('onclick')) {
-            const name = btn.getAttribute('data-name') || btn.getAttribute('data-title') || 'Stylish Bag';
-            const price = btn.getAttribute('data-price') || 250;
-            const img = btn.getAttribute('data-image') || '';
-            addToCart(name, price, img);
+            addToCart(btn.getAttribute('data-name') || 'Stylish Bag', btn.getAttribute('data-price') || 250, btn.getAttribute('data-image') || '');
         }
     });
 }
 
 function initComingSoon() {
-    const teaserCards = document.querySelectorAll('.teaser-card');
-    teaserCards.forEach(card => {
+    document.querySelectorAll('.teaser-card').forEach(card => {
         card.style.cursor = 'pointer';
         card.addEventListener('click', () => {
-            const title = card.querySelector('h4') ? card.querySelector('h4').innerText : 'this collection';
-            const userEmail = prompt(`🔔 Want early access?\nEnter your email to get notified when "${title}" launches:`);
-            if (userEmail && userEmail.trim() !== '') {
-                const subscribers = JSON.parse(localStorage.getItem('restyle_waitlist') || '[]');
-                subscribers.push({ category: title, email: userEmail, date: new Date().toLocaleDateString() });
-                localStorage.setItem('restyle_waitlist', JSON.stringify(subscribers));
-                alert(`Thank you! We will notify ${userEmail} as soon as ${title} drops. ♥`);
+            const title = card.querySelector('h4') ? card.querySelector('h4').innerText : 'item';
+            const email = prompt(`Get notified when "${title}" launches! Enter your email:`);
+            if (email && email.includes('@')) {
+                loadWaitlist();
+                waitlist.unshift({
+                    item: title,
+                    email: email.trim(),
+                    date: new Date().toLocaleDateString()
+                });
+                saveWaitlist();
+                alert(`Thanks! We'll email you at ${email} as soon as this launches.`);
             }
         });
     });
 }
 
-/* --- ADMIN PANEL --- */
-function initAdminPanel() {
+/* --- ADMIN PANEL SYSTEM --- */
+window.initAdminPanel = function() {
     const loginScreen = document.getElementById('admin-login-screen');
     const dashboard = document.getElementById('admin-dashboard');
     const loginForm = document.getElementById('admin-login-form');
     const logoutBtn = document.getElementById('admin-logout-btn');
+    const addProductForm = document.getElementById('add-product-form');
+    const resetBtn = document.getElementById('reset-defaults-btn');
 
     const isLoggedIn = localStorage.getItem('restyle_admin_logged_in') === 'true';
 
@@ -731,7 +611,7 @@ function initAdminPanel() {
                 if (dashboard) dashboard.style.display = 'block';
                 refreshAdminDashboard();
             } else {
-                alert('Invalid Password. Try using: admin123');
+                alert('Invalid Password. Try: admin123');
             }
         });
     }
@@ -744,13 +624,72 @@ function initAdminPanel() {
             if (loginScreen) loginScreen.style.display = 'flex';
         });
     }
+
+    if (addProductForm && !addProductForm.dataset.bound) {
+        addProductForm.dataset.bound = "true";
+        addProductForm.addEventListener('submit', handleAddProductSubmit);
+    }
+
+    if (resetBtn && !resetBtn.dataset.bound) {
+        resetBtn.dataset.bound = "true";
+        resetBtn.addEventListener('click', () => {
+            if (confirm('Reset product inventory back to default demo items?')) {
+                products = [...DEFAULT_PRODUCTS];
+                saveProducts();
+                refreshAdminDashboard();
+            }
+        });
+    }
+};
+
+function handleAddProductSubmit(e) {
+    e.preventDefault();
+
+    const title = document.getElementById('prod-title')?.value.trim();
+    const price = parseFloat(document.getElementById('prod-price')?.value) || 0;
+    const stock = parseInt(document.getElementById('prod-stock')?.value) || 0;
+    const category = document.getElementById('prod-category')?.value || 'Handbags';
+    const status = document.getElementById('prod-status')?.value || 'available';
+    const imageUrl = document.getElementById('prod-image')?.value.trim();
+    const fileInput = document.getElementById('prod-file');
+
+    const saveAndPublish = (imgSrc) => {
+        const newProduct = {
+            id: 'prod_' + Date.now(),
+            title: title,
+            price: price,
+            stock: stock,
+            category: category,
+            status: status,
+            image: imgSrc || 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=500'
+        };
+
+        loadProducts();
+        products.unshift(newProduct);
+        saveProducts();
+        refreshAdminDashboard();
+
+        document.getElementById('add-product-form').reset();
+        alert('✅ Product published successfully!');
+    };
+
+    if (fileInput && fileInput.files && fileInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+            saveAndPublish(evt.target.result);
+        };
+        reader.readAsDataURL(fileInput.files[0]);
+    } else {
+        saveAndPublish(imageUrl);
+    }
 }
 
-function refreshAdminDashboard() {
+window.refreshAdminDashboard = function() {
     renderAdminStats();
     renderAdminProducts();
+    renderAdminWaitlist();
     renderAdminSales();
-}
+};
 
 function renderAdminStats() {
     loadOrders();
@@ -759,24 +698,14 @@ function renderAdminStats() {
     const revenueEl = document.getElementById('total-revenue-display');
     const ordersEl = document.getElementById('total-orders-display');
     const itemsSoldEl = document.getElementById('total-items-sold-display');
+    const prodCountEl = document.getElementById('total-prod-count');
 
-    let totalRevenue = 0;
-    let totalItems = 0;
-
-    orders.forEach(ord => {
-        totalRevenue += parseFloat(ord.total) || 0;
-        if (ord.items) {
-            const parts = ord.items.split(',');
-            parts.forEach(p => {
-                const match = p.trim().match(/^(\d+)x/);
-                totalItems += match ? parseInt(match[1]) : 1;
-            });
-        }
-    });
+    let totalRevenue = orders.reduce((sum, ord) => sum + (parseFloat(ord.total) || 0), 0);
 
     if (revenueEl) revenueEl.innerText = `R${totalRevenue.toFixed(2)}`;
     if (ordersEl) ordersEl.innerText = orders.length;
-    if (itemsSoldEl) itemsSoldEl.innerText = totalItems;
+    if (itemsSoldEl) itemsSoldEl.innerText = orders.length;
+    if (prodCountEl) prodCountEl.innerText = products.length;
 }
 
 function renderAdminProducts() {
@@ -794,17 +723,45 @@ function renderAdminProducts() {
         <tr>
             <td style="padding:8px;"><img src="${product.image}" style="width:40px; height:40px; object-fit:cover; border-radius:4px;"></td>
             <td style="padding:8px;"><strong>${product.title}</strong></td>
+            <td style="padding:8px;">${product.category || 'N/A'}</td>
             <td style="padding:8px;">R${parseFloat(product.price).toFixed(2)}</td>
             <td style="padding:8px;">
                 <input type="number" value="${product.stock}" min="0" onchange="updateProductStock('${product.id}', this.value)" style="width:60px; padding:4px;">
             </td>
-            <td style="padding:8px;"><span class="badge">${product.status}</span></td>
             <td style="padding:8px;">
                 <button onclick="deleteProduct('${product.id}')" style="color:red; background:none; border:none; cursor:pointer;"><i class="fas fa-trash"></i> Delete</button>
             </td>
         </tr>
     `).join('');
 }
+
+function renderAdminWaitlist() {
+    const tbody = document.getElementById('admin-waitlist-rows');
+    if (!tbody) return;
+
+    loadWaitlist();
+
+    if (waitlist.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding:15px;">No subscribers yet.</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = waitlist.map(w => `
+        <tr>
+            <td style="padding:8px;"><strong>${w.item}</strong></td>
+            <td style="padding:8px;">${w.email}</td>
+            <td style="padding:8px;">${w.date}</td>
+        </tr>
+    `).join('');
+}
+
+window.clearWaitlist = function() {
+    if (confirm('Are you sure you want to clear the early access subscriber list?')) {
+        waitlist = [];
+        saveWaitlist();
+        renderAdminWaitlist();
+    }
+};
 
 window.updateProductStock = function(id, newStock) {
     const prod = products.find(p => String(p.id) === String(id));
@@ -828,7 +785,7 @@ function renderAdminSales() {
 
     loadOrders();
     if (orders.length === 0) {
-        container.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:15px;">No orders recorded yet.</td></tr>';
+        container.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:15px;">No orders recorded yet.</td></tr>';
         return;
     }
 
@@ -838,9 +795,7 @@ function renderAdminSales() {
             <td style="padding:8px;">${o.date}</td>
             <td style="padding:8px;">${o.customer} (${o.phone || 'N/A'})</td>
             <td style="padding:8px;">${o.items}</td>
-            <td style="padding:8px;">R${(parseFloat(o.shippingCost) || 0).toFixed(2)} (${o.deliveryMethod})</td>
             <td style="padding:8px;"><strong>R${parseFloat(o.total).toFixed(2)}</strong></td>
-            <td style="padding:8px;"><span class="badge">${o.paymentMethod}</span></td>
         </tr>
     `).join('');
 }
